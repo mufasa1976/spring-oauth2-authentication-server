@@ -5,8 +5,8 @@ spring:
         provider:
           my-server:
             authorization-uri: http://localhost:8080/oauth/authorize
-        registration:
-          my-server:
-            provider: my-server
-            client-id: my-server-frontend
-            client-secret: secret123
+#        registration:
+#          my-server:
+#            provider: my-server
+#            client-id: my-server-frontend
+#            client-secret: secret123
