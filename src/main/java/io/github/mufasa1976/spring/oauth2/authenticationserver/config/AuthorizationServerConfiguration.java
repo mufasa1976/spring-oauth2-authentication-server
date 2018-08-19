@@ -24,11 +24,16 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
 
   @Override
   public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
-    security.passwordEncoder(passwordEncoder);
+    security.passwordEncoder(passwordEncoder)
+            .tokenKeyAccess("permitAll()")
+            .checkTokenAccess("isAuthenticated()");
   }
 
   @Override
   public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
+    clients.inMemory()
+           .withClient("my-server-frontend")
+           .secret("secret123");
   }
 
   @Override
