@@ -28,14 +28,15 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
   public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
     clients.inMemory()
            .withClient("my-server-frontend")
-           .secret("secret123");
+           .authorizedGrantTypes("authorization_code", "client_credentials");
   }
 
   @Override
   public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
     security.passwordEncoder(passwordEncoder)
             .tokenKeyAccess("permitAll()")
-            .checkTokenAccess("isAuthenticated()");
+            .checkTokenAccess("isAuthenticated()")
+            .allowFormAuthenticationForClients();
   }
 
   @Override
