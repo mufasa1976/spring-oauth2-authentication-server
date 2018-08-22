@@ -17,10 +17,11 @@ public class GlobalMethodSecurityConfiguration
     extends org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration {
   @Override
   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    PasswordEncoder passwordEncoder = passwordEncoder();
     auth.inMemoryAuthentication()
-        .passwordEncoder(passwordEncoder())
+        .passwordEncoder(passwordEncoder)
         .withUser("user")
-        .password("password")
+        .password(passwordEncoder.encode("password"))
         .roles("USER1", "USER2");
   }
 

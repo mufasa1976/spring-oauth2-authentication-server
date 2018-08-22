@@ -2,6 +2,7 @@ package io.github.mufasa1976.spring.oauth2.authenticationserver.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -11,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 
 @Configuration
 @EnableWebSecurity
+@Order
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
   @Bean
   @Override
@@ -35,7 +37,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         .antMatchers("/api/**").authenticated()
         .anyRequest().permitAll()
         .and()
-        .formLogin()
-        .loginPage("/login.html");
+        .httpBasic()
+        .and()
+        .csrf().disable();
   }
 }
