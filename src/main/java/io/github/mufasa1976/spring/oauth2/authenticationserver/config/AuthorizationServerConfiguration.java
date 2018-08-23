@@ -11,21 +11,17 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.A
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
-import org.springframework.security.oauth2.provider.token.TokenEnhancer;
-import org.springframework.security.oauth2.provider.token.TokenEnhancerChain;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
-
-import java.util.Arrays;
 
 @Configuration
 @RequiredArgsConstructor
 @EnableAuthorizationServer
 public class AuthorizationServerConfiguration extends AuthorizationServerConfigurerAdapter {
+  private final PasswordEncoder passwordEncoder;
   private final AuthenticationManager authenticationManager;
   private final UserDetailsService userDetailsService;
-  private final PasswordEncoder passwordEncoder;
 
   @Override
   public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
@@ -43,14 +39,10 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
 
   @Override
   public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-    TokenEnhancerChain tokenEnhancerChain = new TokenEnhancerChain();
-    tokenEnhancerChain.setTokenEnhancers(Arrays.asList(tokenEnhancer(), accessTokenConverter()));
-
     endpoints.tokenStore(tokenStore())
-             .tokenEnhancer(tokenEnhancerChain)
+             .accessTokenConverter(accessTokenConverter())
              .authenticationManager(authenticationManager)
-             .userDetailsService(userDetailsService)
-             .approvalStoreDisabled();
+             .userDetailsService(userDetailsService);
   }
 
   @Bean
@@ -61,14 +53,7 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
   @Bean
   public JwtAccessTokenConverter accessTokenConverter() {
     JwtAccessTokenConverter accessTokenConverter = new JwtAccessTokenConverter();
-    accessTokenConverter.setSigningKey("123");
+    accessTokenConverter.setSigningKey("secret123");
     return accessTokenConverter;
-  }
-
-  @Bean
-  public TokenEnhancer tokenEnhancer() {
-    return (accessToken, authentication) -> {
-      return accessToken;
-    };
   }
 }
