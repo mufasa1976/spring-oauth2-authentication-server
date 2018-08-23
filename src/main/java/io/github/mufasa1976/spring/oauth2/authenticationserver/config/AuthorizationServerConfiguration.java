@@ -27,7 +27,8 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
   public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
     clients.inMemory()
            .withClient("my-server-frontend")
-           .authorizedGrantTypes("authorization_code", "client_credentials");
+           .authorizedGrantTypes("authorization_code", "client_credentials", "implicit", "password")
+           .redirectUris("http://localhost:8080/index.html");
   }
 
   @Override
