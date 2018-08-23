@@ -27,7 +27,7 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
   public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
     clients.inMemory()
            .withClient("my-server-frontend")
-           .secret("123dabei")
+           .secret(passwordEncoder.encode("123dabei"))
            .authorizedGrantTypes("authorization_code", "client_credentials", "implicit", "password", "refresh_token")
            .redirectUris("http://localhost:8080/index.html")
            .autoApprove("true");
