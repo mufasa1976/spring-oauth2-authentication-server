@@ -22,11 +22,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
   @Override
   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-    PasswordEncoder passwordEncoder = passwordEncoder();
-    auth.inMemoryAuthentication()
-        .withUser("user")
-        .password(passwordEncoder.encode("password"))
-        .roles("USER1", "USER2");
+    auth.ldapAuthentication()
+        .userDnPatterns("uid={0},ou=people")
+        .groupSearchBase("ou=groups");
   }
 
   @Bean
