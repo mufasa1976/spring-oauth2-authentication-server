@@ -1,7 +1,0 @@
-spring:
-  ldap:
-    embedded:
-      base-dn: dc=springframework,dc=com
-      port: 33389
-      validation:
-        enabled: false
