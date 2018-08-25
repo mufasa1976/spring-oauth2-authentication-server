@@ -1,0 +1,8 @@
+spring:
+  ldap:
+    embedded:
+      base-dn: dc=springframework,dc=org
+      port: 33389
+      credential:
+        username: uid=admin,ou=people,dc=springframework,dc=org
+        password: password
