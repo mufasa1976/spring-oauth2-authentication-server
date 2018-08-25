@@ -24,8 +24,6 @@
         <webjars-bootstrap.version>4.1.3</webjars-bootstrap.version>
         <webjars-jquery.version>3.3.1</webjars-jquery.version>
         <webjars-popper.version>1.14.3</webjars-popper.version>
-
-        <apache-directory-server.version>1.5.7</apache-directory-server.version>
     </properties>
 
     <dependencyManagement>
@@ -61,12 +59,6 @@
                 <artifactId>springfox-swagger-ui</artifactId>
                 <version>${swagger2.version}</version>
             </dependency>
-
-            <dependency>
-                <groupId>org.apache.directory.server</groupId>
-                <artifactId>apacheds-server-jndi</artifactId>
-                <version>${apache-directory-server.version}</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -91,15 +83,9 @@
             <artifactId>spring-security-ldap</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.directory.server</groupId>
-            <artifactId>apacheds-server-jndi</artifactId>
-        </dependency>
-        <!--
-        <dependency>
             <groupId>com.unboundid</groupId>
             <artifactId>unboundid-ldapsdk</artifactId>
         </dependency>
-        -->
         <dependency>
             <groupId>org.springframework.security.oauth</groupId>
             <artifactId>spring-security-oauth2</artifactId>
@@ -144,6 +130,4 @@
             </plugin>
         </plugins>
     </build>
-
-
 </project>

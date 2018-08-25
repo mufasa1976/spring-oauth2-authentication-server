@@ -22,9 +22,30 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
   @Override
   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    PasswordEncoder passwordEncoder = passwordEncoder();
+    auth.inMemoryAuthentication()
+        .passwordEncoder(passwordEncoder)
+        .withUser("user")
+        .password(passwordEncoder.encode("password"))
+        .roles("USER", "ADMIN");
+    /*
     auth.ldapAuthentication()
+        .rolePrefix("")
         .userDnPatterns("uid={0},ou=people")
-        .groupSearchBase("ou=groups");
+        .userDetailsContextMapper(new InetOrgPersonContextMapper())
+        .groupSearchBase("ou=groups")
+        .groupSearchFilter("member={0}")
+        .authoritiesMapper(authorities -> {
+          List<GrantedAuthority> modifiedAuthorities = new ArrayList<>();
+          authorities.stream()
+                     .map(GrantedAuthority::getAuthority)
+                     .map(authority -> new SimpleGrantedAuthority("ROLE_MODIFIED_" + authority))
+                     .forEach(modifiedAuthorities::add);
+          return modifiedAuthorities;
+        })
+        .contextSource()
+        .ldif("classpath:schema.ldif");
+        */
   }
 
   @Bean

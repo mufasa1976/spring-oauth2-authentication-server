@@ -1,8 +1,3 @@
-dn: dc=springframework,dc=org
-objectclass: top
-objectclass: domain
-dc: springframework
-
 dn: ou=groups,dc=springframework,dc=org
 objectclass: top
 objectclass: organizationalUnit
@@ -20,7 +15,10 @@ objectclass: organizationalPerson
 objectclass: inetOrgPerson
 cn: Rod Johnson
 sn: Johnson
+givenName: Rod
+displayName: Rod Johnson
 uid: admin
+mail: rod.johnson@springframework.org
 userPassword: password
 
 dn: uid=user,ou=people,dc=springframework,dc=org
@@ -30,7 +28,10 @@ objectclass: organizationalPerson
 objectclass: inetOrgPerson
 cn: Dianne Emu
 sn: Emu
+givenName: Dianne
+displayName: Dianne Emu
 uid: user
+mail: dianne.emu@springframework.org
 userPassword: password
 
 dn: cn=user,ou=groups,dc=springframework,dc=org
