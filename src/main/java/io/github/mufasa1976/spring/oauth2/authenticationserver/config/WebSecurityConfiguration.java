@@ -50,8 +50,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         .userDnPatterns("uid={0},ou=people,dc=springframework,dc=org")
         .userDetailsContextMapper(new InetOrgPersonContextMapper())
         .authoritiesMapper(userDetailsContextMapper())
-        .contextSource()
-        .url("ldap://localhost:33389");
+        .contextSource((LdapContextSource) contextSource);
   }
 
   @Bean
