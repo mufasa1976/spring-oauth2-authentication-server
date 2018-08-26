@@ -1,6 +1,5 @@
 package io.github.mufasa1976.spring.oauth2.authenticationserver.config;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -22,12 +21,16 @@ import org.springframework.security.ldap.userdetails.LdapUserDetailsService;
 
 @Configuration
 @EnableWebSecurity(debug = true)
-@RequiredArgsConstructor
 @Order
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
   private final ContextSource contextSource;
 
   private static final String ROLE_PREFIX = "";
+
+  public WebSecurityConfiguration(ContextSource contextSource) {
+    super(false);
+    this.contextSource = contextSource;
+  }
 
   @Bean
   @Override
