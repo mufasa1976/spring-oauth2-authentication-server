@@ -84,6 +84,5 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     MyUserAuthenticationConverter userAuthenticationConverter = new MyUserAuthenticationConverter();
     userAuthenticationConverter.setUserDetailsService(userDetailsService);
     return userAuthenticationConverter;
-
   }
 }
