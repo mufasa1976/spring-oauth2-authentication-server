@@ -29,6 +29,11 @@ have to put it also into this File (which should not be necessary if you ever us
 embedded LDAP-Server with the Default Spring Security LDAP Configuration because the ```LdapAuthenticationProviderConfigurer```
 already adds this base-DN by Default for embedded LDAP-Server).
 
+## RSA Keystore
+Create the Keystore:
+```
+keytool -genkeypair -keystore src/main/resources/jwk.jks -storetype pkcs12 -storepass changeIt -alias jwk -keyalg rsa -keysize 2048
+```
 ## Example Calls
 
 ### Password Flow

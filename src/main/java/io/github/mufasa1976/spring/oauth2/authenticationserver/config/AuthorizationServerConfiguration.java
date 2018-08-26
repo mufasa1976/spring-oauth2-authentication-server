@@ -1,8 +1,10 @@
 package io.github.mufasa1976.spring.oauth2.authenticationserver.config;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,6 +19,9 @@ import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.UserAuthenticationConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
+import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFactory;
+
+import javax.validation.constraints.NotNull;
 
 @Configuration
 @RequiredArgsConstructor
@@ -26,15 +31,17 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
   private final AuthenticationManager authenticationManager;
   private final UserDetailsService userDetailsService;
 
+  @NotNull
+  @Value("${spring.security.oauth2.keystore}")
+  private Resource keystore;
+
   @Override
   public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
     clients.inMemory()
            .withClient("my-server-frontend")
-           .secret(passwordEncoder.encode("s3cr3t"))
-           .authorizedGrantTypes("authorization_code", "client_credentials", "implicit", "password", "refresh_token")
+           .authorizedGrantTypes("authorization_code", "implicit", "password", "refresh_token")
            .redirectUris("http://localhost:8080/index.html")
-           .autoApprove("true")
-           .authorities("CLIENT_USER", "CLIENT_ADMIN");
+           .autoApprove("true");
   }
 
   @Override
@@ -61,8 +68,9 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
   @Bean
   public JwtAccessTokenConverter jwtAccessTokenConverter() {
     JwtAccessTokenConverter jwtAccessTokenConverter = new JwtAccessTokenConverter();
-    jwtAccessTokenConverter.setSigningKey("secret123");
     jwtAccessTokenConverter.setAccessTokenConverter(accessTokenConverter());
+    KeyStoreKeyFactory keystore = new KeyStoreKeyFactory(this.keystore, "changeIt".toCharArray());
+    jwtAccessTokenConverter.setKeyPair(keystore.getKeyPair("jwk"));
     return jwtAccessTokenConverter;
   }
 

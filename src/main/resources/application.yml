@@ -1,4 +1,7 @@
 spring:
+  security:
+    oauth2:
+      keystore: classpath:/jwk.jks
   ldap:
     embedded:
       base-dn: dc=springframework,dc=org
