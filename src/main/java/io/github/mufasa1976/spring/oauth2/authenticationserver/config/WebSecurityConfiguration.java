@@ -4,8 +4,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.ldap.core.ContextSource;
 import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,6 +12,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,6 +22,8 @@ import org.springframework.security.ldap.userdetails.DefaultLdapAuthoritiesPopul
 import org.springframework.security.ldap.userdetails.InetOrgPersonContextMapper;
 import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 import org.springframework.security.ldap.userdetails.LdapUserDetailsService;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -94,7 +95,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         .and()
         .anonymous()
         .and()
-        .exceptionHandling()
+        .exceptionHandling().authenticationEntryPoint(this::redirectToLoginPage)
         .and()
         .headers()
         .and()
@@ -108,8 +109,22 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     super.configure(http);
   }
 
+  private void redirectToLoginPage(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+    UriComponentsBuilder uriComponentsBuilder =
+        ServletUriComponentsBuilder.fromCurrentContextPath()
+                                   .path("/login.html");
+    request.getParameterMap()
+           .forEach((name, values) -> uriComponentsBuilder.queryParam(name, values));
+    response.sendRedirect(uriComponentsBuilder.toUriString());
+  }
+
   private void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-    response.setStatus(HttpStatus.FOUND.value());
-    response.setHeader(HttpHeaders.LOCATION, "oauth/authorize&response_type=code&client_id=my-server-frontend&scope=read%20write");
+    UriComponentsBuilder uriComponentsBuilder =
+        ServletUriComponentsBuilder.fromCurrentContextPath()
+                                   .path("/oauth/authorize")
+                                   .queryParam("response_type", "code")
+                                   .queryParam("client_id", "my-server-frontend")
+                                   .queryParam("scope", "read write");
+    response.sendRedirect(uriComponentsBuilder.toUriString());
   }
 }
