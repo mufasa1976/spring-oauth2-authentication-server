@@ -86,7 +86,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
-    http.antMatcher("/oauth/**")
+    http.requestMatchers()
+        .antMatchers("/oauth/**", "/login")
+        .and()
         .authorizeRequests().anyRequest().permitAll()
         .and()
         .securityContext()
@@ -104,6 +106,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         .servletApi()
         .and()
         .formLogin()
+        .loginPage("/login")
+        .successHandler(this::onAuthenticationSuccess)
+        .permitAll()
         .and()
         .csrf();
     super.configure(http);
@@ -112,9 +117,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
   private void redirectToLoginPage(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
     UriComponentsBuilder uriComponentsBuilder =
         ServletUriComponentsBuilder.fromCurrentContextPath()
-                                   .path("/login.html");
+                                   .path("/login");
     request.getParameterMap()
-           .forEach((name, values) -> uriComponentsBuilder.queryParam(name, values));
+           .forEach(uriComponentsBuilder::queryParam);
     response.sendRedirect(uriComponentsBuilder.toUriString());
   }
 
