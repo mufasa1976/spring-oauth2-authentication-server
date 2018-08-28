@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 @Builder
 public class LoginData {
+  private String response_type;
   private String client_id;
   private String scope;
   private String redirectUri;

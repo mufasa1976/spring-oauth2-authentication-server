@@ -1,5 +1,6 @@
 package io.github.mufasa1976.spring.oauth2.authenticationserver.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -29,10 +30,12 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.stream.Stream;
 
 @Configuration
 @EnableWebSecurity(debug = true)
 @Order(Ordered.LOWEST_PRECEDENCE - 10)
+@Slf4j
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
   private final ContextSource contextSource;
 
@@ -111,25 +114,30 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         .permitAll()
         .and()
         .csrf();
-    super.configure(http);
   }
 
   private void redirectToLoginPage(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
     UriComponentsBuilder uriComponentsBuilder =
         ServletUriComponentsBuilder.fromCurrentContextPath()
                                    .path("/login");
-    request.getParameterMap()
-           .forEach(uriComponentsBuilder::queryParam);
+    addQueryParams(uriComponentsBuilder, request);
     response.sendRedirect(uriComponentsBuilder.toUriString());
+  }
+
+  private void addQueryParams(UriComponentsBuilder uriComponentsBuilder, HttpServletRequest request) {
+    request.getParameterMap()
+           .entrySet()
+           .stream()
+           .filter(entry -> Stream.of("_csrf", "username", "password")
+                                  .noneMatch(entry.getKey()::equals))
+           .forEach(entry -> uriComponentsBuilder.queryParam(entry.getKey(), entry.getValue()));
   }
 
   private void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
     UriComponentsBuilder uriComponentsBuilder =
         ServletUriComponentsBuilder.fromCurrentContextPath()
-                                   .path("/oauth/authorize")
-                                   .queryParam("response_type", "code")
-                                   .queryParam("client_id", "my-server-frontend")
-                                   .queryParam("scope", "read write");
+                                   .path("/oauth/authorize");
+    addQueryParams(uriComponentsBuilder, request);
     response.sendRedirect(uriComponentsBuilder.toUriString());
   }
 }
