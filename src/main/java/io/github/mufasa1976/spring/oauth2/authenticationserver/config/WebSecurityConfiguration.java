@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpHeaders;
 import org.springframework.ldap.core.ContextSource;
 import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,23 +23,16 @@ import org.springframework.security.ldap.userdetails.DefaultLdapAuthoritiesPopul
 import org.springframework.security.ldap.userdetails.InetOrgPersonContextMapper;
 import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 import org.springframework.security.ldap.userdetails.LdapUserDetailsService;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Base64;
-import java.util.Optional;
 
-import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
+import static org.springframework.security.config.http.SessionCreationPolicy.IF_REQUIRED;
 
 @Configuration
 @EnableWebSecurity(debug = true)
@@ -106,7 +98,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         .and()
         .securityContext()
         .and()
-        .sessionManagement().sessionCreationPolicy(STATELESS)
+        .sessionManagement().sessionCreationPolicy(IF_REQUIRED)
+        .sessionFixation().changeSessionId()
         .and()
         .anonymous()
         .and()
@@ -123,7 +116,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         .successHandler(this::onAuthenticationSuccess)
         .permitAll()
         .and()
-        .csrf().csrfTokenRepository(getCsrfTokenRepository());
+        .csrf()
+        .and()
+        .httpBasic();
   }
 
   private void redirectToLoginPage(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
@@ -144,35 +139,10 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
   }
 
   private void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-    UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromPath("/oauth/authorize");
+    UriComponentsBuilder uriComponentsBuilder =
+        ServletUriComponentsBuilder.fromCurrentContextPath()
+                                   .path("/oauth/authorize");
     addQueryParams(uriComponentsBuilder, request);
-    RequestDispatcher requestDispatcher =
-        Optional.of(request)
-                .map(ServletRequest::getServletContext)
-                .map(servletContext -> servletContext.getRequestDispatcher(uriComponentsBuilder.toUriString()))
-                .orElseThrow(() -> new IllegalStateException("No RequestDispatcher available"));
-    requestDispatcher.forward(new BasicAuthorizationHeaderHttpServletRequestWrapper(request), response);
-  }
-
-  private CsrfTokenRepository getCsrfTokenRepository() {
-    CookieCsrfTokenRepository csrfTokenRepository = new CookieCsrfTokenRepository();
-    csrfTokenRepository.setCookieHttpOnly(true);
-    return csrfTokenRepository;
-  }
-
-  private static class BasicAuthorizationHeaderHttpServletRequestWrapper extends HttpServletRequestWrapper {
-    public BasicAuthorizationHeaderHttpServletRequestWrapper(HttpServletRequest request) {
-      super(request);
-    }
-
-    @Override
-    public String getHeader(String name) {
-      if (HttpHeaders.AUTHORIZATION.equals(name)) {
-        String username = getParameter("username");
-        String password = getParameter("password");
-        return "Basic " + Base64.getEncoder().encodeToString((username + ':' + password).getBytes());
-      }
-      return super.getHeader(name);
-    }
+    response.sendRedirect(uriComponentsBuilder.toUriString());
   }
 }

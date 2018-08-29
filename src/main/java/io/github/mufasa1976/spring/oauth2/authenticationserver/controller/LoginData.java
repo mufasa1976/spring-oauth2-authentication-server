@@ -9,7 +9,8 @@ public class LoginData {
   private String response_type;
   private String client_id;
   private String scope;
-  private String redirectUri;
+  private String redirect_uri;
   private String username;
   private String password;
+  private String state;
 }
