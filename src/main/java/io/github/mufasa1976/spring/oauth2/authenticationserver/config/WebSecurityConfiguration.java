@@ -23,6 +23,7 @@ import org.springframework.security.ldap.userdetails.DefaultLdapAuthoritiesPopul
 import org.springframework.security.ldap.userdetails.InetOrgPersonContextMapper;
 import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 import org.springframework.security.ldap.userdetails.LdapUserDetailsService;
+import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -31,8 +32,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.stream.Stream;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.IF_REQUIRED;
+import static org.springframework.security.oauth2.common.util.OAuth2Utils.*;
 
 @Configuration
 @EnableWebSecurity(debug = true)
@@ -92,7 +95,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
   @Override
   protected void configure(HttpSecurity http) throws Exception {
     http.requestMatchers()
-        .antMatchers("/oauth/**", "/login")
+        .antMatchers("/oauth/**", "/redirectToLogin", "/login")
         .and()
         .authorizeRequests().anyRequest().permitAll()
         .and()
@@ -124,7 +127,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
   private void redirectToLoginPage(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
     UriComponentsBuilder uriComponentsBuilder =
         ServletUriComponentsBuilder.fromCurrentContextPath()
-                                   .path("/login");
+                                   .path("/redirectToLogin");
+
     addQueryParams(uriComponentsBuilder, request);
     response.sendRedirect(uriComponentsBuilder.toUriString());
   }
@@ -133,9 +137,11 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     request.getParameterMap()
            .entrySet()
            .stream()
-           .filter(entry -> Arrays.asList("response_type", "client_id", "scope", "redirectUri")
+           .filter(entry -> Arrays.asList(RESPONSE_TYPE, CLIENT_ID, SCOPE, REDIRECT_URI, STATE)
                                   .contains(entry.getKey()))
-           .forEach(entry -> uriComponentsBuilder.queryParam(entry.getKey(), entry.getValue()));
+           .filter(entry -> !Stream.of(entry.getValue())
+                                   .allMatch(StringUtils::isEmpty))
+           .forEach(entry -> uriComponentsBuilder.queryParam(entry.getKey(), (Object[]) entry.getValue()));
   }
 
   private void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
