@@ -116,15 +116,18 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         .and()
         .formLogin()
         .loginPage("/login")
-        .successHandler(this::onAuthenticationSuccess)
         .permitAll()
+        .successHandler(this::onAuthenticationSuccess)
+        .failureHandler(this::redirectToLoginPageAfterError)
         .and()
-        .csrf()
-        .and()
-        .httpBasic();
+        .csrf();
   }
 
-  private void redirectToLoginPage(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+  private void redirectToLoginPage(
+      HttpServletRequest request,
+      HttpServletResponse response,
+      AuthenticationException authException)
+      throws IOException, ServletException {
     UriComponentsBuilder uriComponentsBuilder =
         ServletUriComponentsBuilder.fromCurrentContextPath()
                                    .path("/redirectToLogin");
@@ -142,6 +145,19 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
            .filter(entry -> !Stream.of(entry.getValue())
                                    .allMatch(StringUtils::isEmpty))
            .forEach(entry -> uriComponentsBuilder.queryParam(entry.getKey(), (Object[]) entry.getValue()));
+  }
+
+  private void redirectToLoginPageAfterError(
+      HttpServletRequest request,
+      HttpServletResponse response,
+      AuthenticationException authException)
+      throws IOException, ServletException {
+    UriComponentsBuilder uriComponentsBuilder =
+        ServletUriComponentsBuilder.fromCurrentContextPath()
+                                   .path("/redirectToLogin")
+                                   .queryParam("error");
+    addQueryParams(uriComponentsBuilder, request);
+    response.sendRedirect(uriComponentsBuilder.toUriString());
   }
 
   private void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
