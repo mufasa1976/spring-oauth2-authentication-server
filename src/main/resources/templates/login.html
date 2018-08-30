@@ -19,11 +19,12 @@
                 <input type="hidden" th:field="*{scope}">
                 <input type="hidden" th:field="*{redirect_uri}">
                 <input type="hidden" th:field="*{state}">
-                <div class="card-header">
-                    Login
-                </div>
                 <div class="card">
+                    <div class="card-header" th:text="${#messages.msg(#strings.prepend(loginData.client_id, 'loginForm.header.'))}">
+                        Login
+                    </div>
                     <div class="card-body">
+                        <div class="alert alert-danger" role="alert" th:if="${param.error}" th:text="#{loginForm.error}">Bad Credentials</div>
                         <div class="form-group">
                             <label for="username" th:text="#{loginForm.field.username.label}">Username:</label>
                             <input type="text" class="form-control" name="username" th:field="*{username}" autofocus>
@@ -33,9 +34,9 @@
                             <input type="password" class="form-control" name="password" th:field="*{password}">
                         </div>
                     </div>
-                </div>
-                <div class="card-footer text-right">
-                    <button type="submit">Login</button>
+                    <div class="card-footer text-right">
+                        <button type="submit" th:text="#{loginForm.button.submit.label}">Login</button>
+                    </div>
                 </div>
             </form>
         </div>
