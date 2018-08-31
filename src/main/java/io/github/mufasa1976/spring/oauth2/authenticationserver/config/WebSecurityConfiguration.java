@@ -130,7 +130,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
       throws IOException, ServletException {
     UriComponentsBuilder uriComponentsBuilder =
         ServletUriComponentsBuilder.fromCurrentContextPath()
-                                   .path("/redirectToLogin");
+                                   .path("/login/redirect");
 
     addQueryParams(uriComponentsBuilder, request);
     response.sendRedirect(uriComponentsBuilder.toUriString());
@@ -154,7 +154,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
       throws IOException, ServletException {
     UriComponentsBuilder uriComponentsBuilder =
         ServletUriComponentsBuilder.fromCurrentContextPath()
-                                   .path("/redirectToLogin")
+                                   .path("/login/redirect")
                                    .queryParam("error");
     addQueryParams(uriComponentsBuilder, request);
     response.sendRedirect(uriComponentsBuilder.toUriString());

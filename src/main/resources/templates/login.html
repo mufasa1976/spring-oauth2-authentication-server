@@ -35,7 +35,8 @@
                         </div>
                     </div>
                     <div class="card-footer text-right">
-                        <button type="submit" th:text="#{loginForm.button.submit.label}">Login</button>
+                        <a href="#" th:href="@{/login/cancel}" class="btn btn-secondary" role="button">Cancel</a>
+                        <button type="submit" class="btn btn-primary" th:text="#{loginForm.button.submit.label}">Login</button>
                     </div>
                 </div>
             </form>

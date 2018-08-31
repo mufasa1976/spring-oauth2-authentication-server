@@ -1,5 +1,8 @@
 package io.github.mufasa1976.spring.oauth2.authenticationserver.controller;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
+import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -7,14 +10,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Controller
+@RequiredArgsConstructor
 public class LoginController {
   private static final String MODEL = "loginData";
 
-  @GetMapping("/redirectToLogin")
+  private final ClientDetailsService clientDetailsService;
+
+  @GetMapping("/login/redirect")
   public String redirectToLogin(
       @ModelAttribute LoginData loginData,
       @RequestParam Map<String, ?> requestParameter,
@@ -28,6 +35,16 @@ public class LoginController {
 
   @GetMapping("/login")
   public ModelAndView showLogin(@ModelAttribute(MODEL) Object loginData) {
-    return new ModelAndView("login", Collections.singletonMap("loginData", loginData == null ? null : (LoginData) loginData));
+    Map<String, Object> model = new HashMap<>();
+    Optional.ofNullable(loginData)
+            .filter(LoginData.class::isInstance)
+            .map(LoginData.class::cast)
+            .ifPresent(ld -> model.put("loginData", ld));
+    return new ModelAndView("login", model);
+  }
+
+  @GetMapping("/login/cancel")
+  public void cancelLogin() {
+    throw OAuth2Exception.create(OAuth2Exception.ACCESS_DENIED, "User cancelled the Login");
   }
 }
