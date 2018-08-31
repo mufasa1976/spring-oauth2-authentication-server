@@ -1,7 +1,6 @@
 package io.github.mufasa1976.spring.oauth2.authenticationserver.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,10 +40,5 @@ public class LoginController {
             .map(LoginData.class::cast)
             .ifPresent(ld -> model.put("loginData", ld));
     return new ModelAndView("login", model);
-  }
-
-  @GetMapping("/login/cancel")
-  public void cancelLogin() {
-    throw OAuth2Exception.create(OAuth2Exception.ACCESS_DENIED, "User cancelled the Login");
   }
 }
