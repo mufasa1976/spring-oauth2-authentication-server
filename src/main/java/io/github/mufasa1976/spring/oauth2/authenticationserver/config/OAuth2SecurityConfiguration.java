@@ -41,12 +41,12 @@ import static org.springframework.security.oauth2.common.util.OAuth2Utils.*;
 @EnableWebSecurity(debug = true)
 @Order(Ordered.LOWEST_PRECEDENCE - 10)
 @Slf4j
-public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
+public class OAuth2SecurityConfiguration extends WebSecurityConfigurerAdapter {
   private final ContextSource contextSource;
 
   private static final String ROLE_PREFIX = "";
 
-  public WebSecurityConfiguration(ContextSource contextSource) {
+  public OAuth2SecurityConfiguration(ContextSource contextSource) {
     super(true);
     this.contextSource = contextSource;
   }
