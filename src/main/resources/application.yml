@@ -9,3 +9,6 @@ spring:
       credential:
         username: uid=admin,ou=people,dc=springframework,dc=org
         password: password
+  redis:
+    embedded:
+      enabled: true

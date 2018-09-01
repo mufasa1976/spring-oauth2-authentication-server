@@ -20,7 +20,7 @@
                 <input type="hidden" th:field="*{redirect_uri}">
                 <input type="hidden" th:field="*{state}">
                 <div class="card">
-                    <div class="card-header" th:text="${#messages.msg(#strings.prepend(loginData.client_id, 'loginForm.header.'))}">
+                    <div class="card-header" th:text="${#messages.msg('loginForm.header', clientName)}">
                         Login
                     </div>
                     <div class="card-body">

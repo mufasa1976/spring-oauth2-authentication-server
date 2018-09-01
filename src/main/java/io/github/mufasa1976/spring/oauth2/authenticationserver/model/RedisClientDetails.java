@@ -21,29 +21,27 @@ import static lombok.AccessLevel.PRIVATE;
 @Builder
 @RedisHash("clientDetails")
 public class RedisClientDetails implements ClientDetails {
+  // Fields inherited by ClientDetails
   @Id
   private String clientId;
   private String clientSecret;
-  @Singular
   @Getter(NONE)
   private Set<String> scopes;
-  @Singular
   private Set<String> resourceIds;
-  @Singular
   private Set<String> authorizedGrantTypes;
-  @Singular("registeredRedirectUri")
   @Getter(NONE)
   private Set<String> registeredRedirectUris;
-  @Singular
   @Getter(NONE)
   private Set<String> autoApprovedScopes;
-  @Singular
   private Collection<GrantedAuthority> authorities;
-  @Singular
   @Getter(NONE)
   private Map<String, Object> additionalInformations;
   private Integer accessTokenValiditySeconds;
   private Integer refreshTokenValiditySeconds;
+
+  // non-standard Fields
+  @Setter
+  private String clientName;
 
   @Override
   public boolean isSecretRequired() {

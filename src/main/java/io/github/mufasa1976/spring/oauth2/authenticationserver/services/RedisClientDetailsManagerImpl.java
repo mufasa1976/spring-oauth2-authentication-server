@@ -1,0 +1,31 @@
+package io.github.mufasa1976.spring.oauth2.authenticationserver.services;
+
+import io.github.mufasa1976.spring.oauth2.authenticationserver.model.RedisClientDetails;
+import io.github.mufasa1976.spring.oauth2.authenticationserver.repositories.RedisClientDetailsRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
+
+@Service
+@RequiredArgsConstructor
+public class RedisClientDetailsManagerImpl implements RedisClientDetailsManager {
+  private final RedisClientDetailsRepository repository;
+
+  @Override
+  public Optional<RedisClientDetails> getClientByClientId(String clientId) {
+    return repository.findById(clientId);
+  }
+
+  @Override
+  public boolean existsClient(String clientId) {
+    return repository.existsById(clientId);
+  }
+
+  @Override
+  @Transactional
+  public RedisClientDetails saveClient(RedisClientDetails clientDetails) {
+    return repository.save(clientDetails);
+  }
+}

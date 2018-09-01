@@ -1,5 +1,7 @@
 package io.github.mufasa1976.spring.oauth2.authenticationserver.config;
 
+import io.github.mufasa1976.spring.oauth2.authenticationserver.services.RedisClientDetailsManager;
+import io.github.mufasa1976.spring.oauth2.authenticationserver.services.RedisClientDetailsServiceBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -27,21 +29,28 @@ import javax.validation.constraints.NotNull;
 @RequiredArgsConstructor
 @EnableAuthorizationServer
 public class AuthorizationServerConfiguration extends AuthorizationServerConfigurerAdapter {
+  public static final String INTERNAL_CLIENT_ID = "internal";
+
   private final PasswordEncoder passwordEncoder;
   private final AuthenticationManager authenticationManager;
   private final UserDetailsService userDetailsService;
+  private final RedisClientDetailsManager clientDetailsManager;
 
   @NotNull
   @Value("${spring.security.oauth2.keystore}")
   private Resource keystore;
 
+  @Value("${spring.security.oauth2.name:Internal Application}")
+  private String internalClientName;
+
   @Override
   public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-    clients.inMemory()
-           .withClient("my-server-frontend")
-           .authorizedGrantTypes("authorization_code", "implicit", "password", "refresh_token")
-           .redirectUris("http://localhost:8080/index.html")
-           .autoApprove("true");
+    RedisClientDetailsServiceBuilder clientDetailsServiceBuilder = new RedisClientDetailsServiceBuilder(clientDetailsManager, internalClientName);
+    clients.setBuilder(clientDetailsServiceBuilder);
+    clientDetailsServiceBuilder.withClient(INTERNAL_CLIENT_ID)
+                               .authorizedGrantTypes("authorization_code", "refresh_token")
+                               .redirectUris("http://localhost:8080/index.html")
+                               .autoApprove("true");
   }
 
   @Override
