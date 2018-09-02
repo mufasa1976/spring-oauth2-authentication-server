@@ -23,19 +23,19 @@ public class LoginController {
 
   private final RedisClientDetailsManager clientDetailsManager;
 
-  @GetMapping("/login/redirect")
+  @GetMapping("/oauth/login/redirect")
   public String redirectToLogin(
       @ModelAttribute LoginData loginData,
       @RequestParam Map<String, ?> requestParameter,
       RedirectAttributes redirectAttributes) {
     redirectAttributes.addFlashAttribute(LOGIN_DATA, loginData);
     if (requestParameter.containsKey("error")) {
-      return "redirect:/login?error";
+      return "redirect:/oauth/login?error";
     }
-    return "redirect:/login";
+    return "redirect:/oauth/login";
   }
 
-  @GetMapping("/login")
+  @GetMapping("/oauth/login")
   public ModelAndView showLogin(@ModelAttribute(LOGIN_DATA) Object loginData) {
     Map<String, Object> model = new HashMap<>();
     Optional.ofNullable(loginData)

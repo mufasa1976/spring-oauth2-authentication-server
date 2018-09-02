@@ -23,19 +23,7 @@ public class RedisClientDetailsServiceBuilder extends ClientDetailsServiceBuilde
   @Override
   protected void addClient(String clientId, ClientDetails clientDetails) {
     BaseClientDetails baseClientDetails = (BaseClientDetails) clientDetails;
-    redisClientDetails.add(RedisClientDetails.builder()
-                                             .clientId(baseClientDetails.getClientId())
-                                             .clientSecret(baseClientDetails.getClientSecret())
-                                             .scopes(baseClientDetails.getScope())
-                                             .resourceIds(baseClientDetails.getResourceIds())
-                                             .authorizedGrantTypes(baseClientDetails.getAuthorizedGrantTypes())
-                                             .registeredRedirectUris(baseClientDetails.getRegisteredRedirectUri())
-                                             .autoApprovedScopes(baseClientDetails.getAutoApproveScopes())
-                                             .authorities(baseClientDetails.getAuthorities())
-                                             .additionalInformations(baseClientDetails.getAdditionalInformation())
-                                             .accessTokenValiditySeconds(baseClientDetails.getAccessTokenValiditySeconds())
-                                             .refreshTokenValiditySeconds(baseClientDetails.getRefreshTokenValiditySeconds())
-                                             .build());
+    redisClientDetails.add(RedisClientDetails.copyFrom(baseClientDetails));
   }
 
   @Override

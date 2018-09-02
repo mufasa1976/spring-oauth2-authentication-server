@@ -95,7 +95,7 @@ public class OAuth2SecurityConfiguration extends WebSecurityConfigurerAdapter {
   @Override
   protected void configure(HttpSecurity http) throws Exception {
     http.requestMatchers()
-        .antMatchers("/oauth/**", "/redirectToLogin", "/login")
+        .antMatchers("/oauth/**")
         .and()
         .authorizeRequests().anyRequest().permitAll()
         .and()
@@ -115,7 +115,7 @@ public class OAuth2SecurityConfiguration extends WebSecurityConfigurerAdapter {
         .servletApi()
         .and()
         .formLogin()
-        .loginPage("/login")
+        .loginPage("/oauth/login")
         .permitAll()
         .successHandler(this::onAuthenticationSuccess)
         .failureHandler(this::redirectToLoginPageAfterError)
@@ -130,7 +130,7 @@ public class OAuth2SecurityConfiguration extends WebSecurityConfigurerAdapter {
       throws IOException, ServletException {
     UriComponentsBuilder uriComponentsBuilder =
         ServletUriComponentsBuilder.fromCurrentContextPath()
-                                   .path("/login/redirect");
+                                   .path("/oauth/login/redirect");
 
     addQueryParams(uriComponentsBuilder, request);
     response.sendRedirect(uriComponentsBuilder.toUriString());
@@ -154,7 +154,7 @@ public class OAuth2SecurityConfiguration extends WebSecurityConfigurerAdapter {
       throws IOException, ServletException {
     UriComponentsBuilder uriComponentsBuilder =
         ServletUriComponentsBuilder.fromCurrentContextPath()
-                                   .path("/login/redirect")
+                                   .path("/oauth/login/redirect")
                                    .queryParam("error");
     addQueryParams(uriComponentsBuilder, request);
     response.sendRedirect(uriComponentsBuilder.toUriString());

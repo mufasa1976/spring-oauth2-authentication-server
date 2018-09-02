@@ -40,7 +40,7 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
   @Value("${spring.security.oauth2.keystore}")
   private Resource keystore;
 
-  @Value("${spring.security.oauth2.name:Internal Application}")
+  @Value("${spring.security.oauth2.client-name:Internal Application}")
   private String internalClientName;
 
   @Override
@@ -48,8 +48,10 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     RedisClientDetailsServiceBuilder clientDetailsServiceBuilder = new RedisClientDetailsServiceBuilder(clientDetailsManager, internalClientName);
     clients.setBuilder(clientDetailsServiceBuilder);
     clientDetailsServiceBuilder.withClient(INTERNAL_CLIENT_ID)
-                               .authorizedGrantTypes("authorization_code", "refresh_token")
-                               .redirectUris("http://localhost:8080/index.html")
+                               .secret("internal")
+                               .authorizedGrantTypes("authorization_code", "refresh_token", "password")
+                               .redirectUris("http://localhost:8080/login/oauth2/code/internal")
+                               .scopes("openid")
                                .autoApprove("true");
   }
 

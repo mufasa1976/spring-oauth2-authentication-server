@@ -2,6 +2,23 @@ spring:
   security:
     oauth2:
       keystore: classpath:/jwk.jks
+      client-name: Internal Application
+      client:
+        provider:
+          internal:
+            authorization-uri: http://localhost:8080/oauth/authorize
+            token-uri: http://localhost:8080/oauth/token
+            jwk-set-uri: http://localhost:8080/oauth/token_key
+        registration:
+          internal:
+            client-id: internal
+            client-secret: internal
+            client-authentication-method: post
+            authorization-grant-type: authorization_code
+            redirect-uri-template: "{baseUrl}/login/oauth2/code/{registrationId}"
+            scope:
+            - openid
+            client-name: ${spring.security.oauth2.client-name}
   ldap:
     embedded:
       base-dn: dc=springframework,dc=org

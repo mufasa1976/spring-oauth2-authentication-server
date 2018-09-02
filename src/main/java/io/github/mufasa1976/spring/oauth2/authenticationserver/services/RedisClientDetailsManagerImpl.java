@@ -3,6 +3,7 @@ package io.github.mufasa1976.spring.oauth2.authenticationserver.services;
 import io.github.mufasa1976.spring.oauth2.authenticationserver.model.RedisClientDetails;
 import io.github.mufasa1976.spring.oauth2.authenticationserver.repositories.RedisClientDetailsRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,6 +13,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class RedisClientDetailsManagerImpl implements RedisClientDetailsManager {
   private final RedisClientDetailsRepository repository;
+  private final Optional<PasswordEncoder> passwordEncoder;
 
   @Override
   public Optional<RedisClientDetails> getClientByClientId(String clientId) {
@@ -26,6 +28,10 @@ public class RedisClientDetailsManagerImpl implements RedisClientDetailsManager 
   @Override
   @Transactional
   public RedisClientDetails saveClient(RedisClientDetails clientDetails) {
+    if (clientDetails.isSecretRequired()) {
+      passwordEncoder.map(pe -> pe.encode(clientDetails.getClientSecret()))
+                     .ifPresent(clientDetails::setClientSecret);
+    }
     return repository.save(clientDetails);
   }
 }
