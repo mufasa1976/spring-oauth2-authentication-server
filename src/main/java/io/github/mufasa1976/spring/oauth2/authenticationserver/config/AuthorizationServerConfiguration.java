@@ -64,7 +64,7 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
   @Override
   public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
     TokenEnhancerChain tokenEnhancerChain = new TokenEnhancerChain();
-    tokenEnhancerChain.setTokenEnhancers(Arrays.asList(jwtAccessTokenConverter()));
+    tokenEnhancerChain.setTokenEnhancers(Arrays.asList(jwtAccessTokenConverter(), idTokenEnhancer()));
     endpoints.tokenStore(tokenStore())
              .tokenEnhancer(tokenEnhancerChain)
              .authenticationManager(authenticationManager)
@@ -95,5 +95,14 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     MyUserAuthenticationConverter userAuthenticationConverter = new MyUserAuthenticationConverter();
     userAuthenticationConverter.setUserDetailsService(userDetailsService);
     return userAuthenticationConverter;
+  }
+
+  @Bean
+  public IdTokenEnhancer idTokenEnhancer() {
+    IdTokenEnhancer idTokenEnhancer = new IdTokenEnhancer();
+    idTokenEnhancer.setUserAuthenticationConverter(userAuthenticationConverter());
+    KeyStoreKeyFactory keystore = new KeyStoreKeyFactory(this.keystore, "changeIt".toCharArray());
+    idTokenEnhancer.setKeyPair(keystore.getKeyPair("jwk"));
+    return idTokenEnhancer;
   }
 }
