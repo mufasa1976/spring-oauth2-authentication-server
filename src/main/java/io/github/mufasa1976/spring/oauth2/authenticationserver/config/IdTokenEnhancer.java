@@ -24,15 +24,14 @@ import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 @Slf4j
 public class IdTokenEnhancer implements TokenEnhancer, InitializingBean {
   public static final String ID_TOKEN = "id_token";
+
+  public static final String SUB = "sub";
 
   @Getter
   @Setter
@@ -100,9 +99,9 @@ public class IdTokenEnhancer implements TokenEnhancer, InitializingBean {
   public OAuth2AccessToken enhance(OAuth2AccessToken accessToken, OAuth2Authentication authentication) {
     Map<String, Object> decodedAccessToken = decode(accessToken.getValue());
     boolean openidAvailable = Optional.ofNullable(decodedAccessToken.get(scopeAttribute))
-                                      .filter(Set.class::isInstance)
-                                      .map(Set.class::cast)
-                                      .map(Set::stream)
+                                      .filter(Collection.class::isInstance)
+                                      .map(Collection.class::cast)
+                                      .map(Collection::stream)
                                       .orElseGet(Stream::empty)
                                       .filter(String.class::isInstance)
                                       .map(String.class::cast)
@@ -113,7 +112,9 @@ public class IdTokenEnhancer implements TokenEnhancer, InitializingBean {
 
     DefaultOAuth2AccessToken enhancedAccessToken = new DefaultOAuth2AccessToken(accessToken);
     LinkedHashMap<String, Object> additionalInformation = new LinkedHashMap<>(accessToken.getAdditionalInformation());
-    additionalInformation.put(ID_TOKEN, encode(createIdToken(authentication), authentication));
+    additionalInformation.put(ID_TOKEN, encode(
+        createIdToken(authentication, (Long) decodedAccessToken.get(AccessTokenConverter.EXP)), authentication));
+    enhancedAccessToken.setAdditionalInformation(additionalInformation);
 
     return enhancedAccessToken;
   }
@@ -134,9 +135,13 @@ public class IdTokenEnhancer implements TokenEnhancer, InitializingBean {
     }
   }
 
-  protected OAuth2AccessToken createIdToken(OAuth2Authentication authentication) {
-    Map<String, String> claims = new LinkedHashMap<>();
-    return DefaultOAuth2AccessToken.valueOf(claims);
+  protected OAuth2AccessToken createIdToken(OAuth2Authentication authentication, Long expiresInMsec) {
+    DefaultOAuth2AccessToken idToken = new DefaultOAuth2AccessToken((String) null);
+    idToken.setExpiration(new Date(expiresInMsec));
+    Map<String, Object> tokenParams = new LinkedHashMap<>();
+    tokenParams.put(AccessTokenConverter.EXP, expiresInMsec.toString());
+    idToken.setAdditionalInformation(tokenParams);
+    return idToken;
   }
 
   protected String encode(OAuth2AccessToken accessToken, OAuth2Authentication authentication) {
