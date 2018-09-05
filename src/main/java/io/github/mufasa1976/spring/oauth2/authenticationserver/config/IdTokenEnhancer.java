@@ -24,13 +24,17 @@ import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @Slf4j
 public class IdTokenEnhancer implements TokenEnhancer, InitializingBean {
   public static final String ID_TOKEN = "id_token";
 
+  public static final String EXP = AccessTokenConverter.EXP;
   public static final String SUB = "sub";
 
   @Getter
@@ -112,8 +116,7 @@ public class IdTokenEnhancer implements TokenEnhancer, InitializingBean {
 
     DefaultOAuth2AccessToken enhancedAccessToken = new DefaultOAuth2AccessToken(accessToken);
     LinkedHashMap<String, Object> additionalInformation = new LinkedHashMap<>(accessToken.getAdditionalInformation());
-    additionalInformation.put(ID_TOKEN, encode(
-        createIdToken(authentication, (Long) decodedAccessToken.get(AccessTokenConverter.EXP)), authentication));
+    additionalInformation.put(ID_TOKEN, createIdToken(authentication, (Long) decodedAccessToken.get(AccessTokenConverter.EXP)));
     enhancedAccessToken.setAdditionalInformation(additionalInformation);
 
     return enhancedAccessToken;
@@ -124,8 +127,8 @@ public class IdTokenEnhancer implements TokenEnhancer, InitializingBean {
       Jwt jwt = JwtHelper.decodeAndVerify(token, verifier);
       String claimsStr = jwt.getClaims();
       Map<String, Object> claims = objectMapper.parseMap(claimsStr);
-      if (claims.containsKey(AccessTokenConverter.EXP) && claims.get(AccessTokenConverter.EXP) instanceof Integer) {
-        Integer intValue = (Integer) claims.get(AccessTokenConverter.EXP);
+      if (claims.containsKey(EXP) && claims.get(EXP) instanceof Integer) {
+        Integer intValue = (Integer) claims.get(EXP);
         claims.put(AccessTokenConverter.EXP, new Long(intValue));
       }
       this.getJwtClaimsSetVerifier().verify(claims);
@@ -135,24 +138,16 @@ public class IdTokenEnhancer implements TokenEnhancer, InitializingBean {
     }
   }
 
-  protected OAuth2AccessToken createIdToken(OAuth2Authentication authentication, Long expiresInMsec) {
-    DefaultOAuth2AccessToken idToken = new DefaultOAuth2AccessToken((String) null);
-    idToken.setExpiration(new Date(expiresInMsec));
-    Map<String, Object> tokenParams = new LinkedHashMap<>();
-    tokenParams.put(AccessTokenConverter.EXP, expiresInMsec.toString());
-    idToken.setAdditionalInformation(tokenParams);
-    return idToken;
-  }
-
-  protected String encode(OAuth2AccessToken accessToken, OAuth2Authentication authentication) {
-    String content;
+  protected String createIdToken(OAuth2Authentication authentication, Long expiresInMsec) {
+    Map<String, Object> tokenContent = new LinkedHashMap<>();
+    tokenContent.put(EXP, expiresInMsec.toString());
+    tokenContent.put(SUB, authentication.getName());
     try {
-      content = objectMapper.formatMap(tokenConverter.convertAccessToken(accessToken, authentication));
+      String stringifiedMap = objectMapper.formatMap(tokenContent);
+      return JwtHelper.encode(stringifiedMap, signer).getEncoded();
     } catch (Exception e) {
-      throw new IllegalStateException("Cannot convert access token to JSON", e);
+      throw new IllegalArgumentException("Cannot convert id token to JSON", e);
     }
-    String token = JwtHelper.encode(content, signer).getEncoded();
-    return token;
   }
 
   @Override

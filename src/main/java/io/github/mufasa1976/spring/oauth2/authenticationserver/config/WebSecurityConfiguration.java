@@ -16,6 +16,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         .antMatchers("/css/**").permitAll()
         .antMatchers("/images/**").permitAll()
         .antMatchers("/js/**").permitAll()
+        .antMatchers("/webjars/**").permitAll()
+        .antMatchers("**/favicon.*").permitAll()
         .anyRequest().authenticated()
         .and()
         .oauth2Login();
