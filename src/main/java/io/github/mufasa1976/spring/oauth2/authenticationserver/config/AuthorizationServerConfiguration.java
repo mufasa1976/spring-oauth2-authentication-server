@@ -81,7 +81,7 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     JwtAccessTokenConverter jwtAccessTokenConverter = new JwtAccessTokenConverter();
     jwtAccessTokenConverter.setAccessTokenConverter(accessTokenConverter());
     KeyStoreKeyFactory keystore = new KeyStoreKeyFactory(this.keystore, "changeIt".toCharArray());
-    jwtAccessTokenConverter.setKeyPair(keystore.getKeyPair("jwk"));
+    jwtAccessTokenConverter.setKeyPair(keystore.getKeyPair("jwt"));
     return jwtAccessTokenConverter;
   }
 
@@ -102,7 +102,7 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     IdTokenEnhancer idTokenEnhancer = new IdTokenEnhancer();
     idTokenEnhancer.setUserAuthenticationConverter(userAuthenticationConverter());
     KeyStoreKeyFactory keystore = new KeyStoreKeyFactory(this.keystore, "changeIt".toCharArray());
-    idTokenEnhancer.setKeyPair(keystore.getKeyPair("jwk"));
+    idTokenEnhancer.setKeyPair(keystore.getKeyPair("jwt"));
     return idTokenEnhancer;
   }
 }

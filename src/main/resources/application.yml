@@ -1,7 +1,7 @@
 spring:
   security:
     oauth2:
-      keystore: classpath:/jwk.jks
+      keystore: classpath:/jwt.jks
       client-name: Internal Application
       client:
         provider:
