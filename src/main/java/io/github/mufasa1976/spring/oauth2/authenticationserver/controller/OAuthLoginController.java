@@ -17,7 +17,7 @@ import java.util.function.Consumer;
 
 @Controller
 @RequiredArgsConstructor
-public class LoginController {
+public class OAuthLoginController {
   private static final String LOGIN_DATA = "loginData";
   private static final String CLIENT_NAME = "clientName";
 
@@ -25,10 +25,10 @@ public class LoginController {
 
   @GetMapping("/oauth/login/redirect")
   public String redirectToLogin(
-      @ModelAttribute LoginData loginData,
+      @ModelAttribute OAuthLoginData oauthLoginData,
       @RequestParam Map<String, ?> requestParameter,
       RedirectAttributes redirectAttributes) {
-    redirectAttributes.addFlashAttribute(LOGIN_DATA, loginData);
+    redirectAttributes.addFlashAttribute(LOGIN_DATA, oauthLoginData);
     if (requestParameter.containsKey("error")) {
       return "redirect:/oauth/login?error";
     }
@@ -39,16 +39,16 @@ public class LoginController {
   public ModelAndView showLogin(@ModelAttribute(LOGIN_DATA) Object loginData) {
     Map<String, Object> model = new HashMap<>();
     Optional.ofNullable(loginData)
-            .filter(LoginData.class::isInstance)
-            .map(LoginData.class::cast)
+            .filter(OAuthLoginData.class::isInstance)
+            .map(OAuthLoginData.class::cast)
             .ifPresent(setLoginDataOn(model));
-    return new ModelAndView("login", model);
+    return new ModelAndView("oauth/login", model);
   }
 
-  private Consumer<LoginData> setLoginDataOn(Map<String, Object> model) {
-    return loginData -> {
-      model.put(LOGIN_DATA, loginData);
-      clientDetailsManager.getClientByClientId(loginData.getClient_id())
+  private Consumer<OAuthLoginData> setLoginDataOn(Map<String, Object> model) {
+    return OAuthLoginData -> {
+      model.put(LOGIN_DATA, OAuthLoginData);
+      clientDetailsManager.getClientByClientId(OAuthLoginData.getClient_id())
                           .map(RedisClientDetails::getClientName)
                           .ifPresent(clientName -> model.put(CLIENT_NAME, clientName));
     };

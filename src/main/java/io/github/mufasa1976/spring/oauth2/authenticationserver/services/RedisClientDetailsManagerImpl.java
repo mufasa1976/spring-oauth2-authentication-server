@@ -13,7 +13,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class RedisClientDetailsManagerImpl implements RedisClientDetailsManager {
   private final RedisClientDetailsRepository repository;
-  private final Optional<PasswordEncoder> passwordEncoder;
+  private final PasswordEncoder passwordEncoder;
 
   @Override
   public Optional<RedisClientDetails> getClientByClientId(String clientId) {
@@ -29,8 +29,7 @@ public class RedisClientDetailsManagerImpl implements RedisClientDetailsManager 
   @Transactional
   public RedisClientDetails saveClient(RedisClientDetails clientDetails) {
     if (clientDetails.isSecretRequired()) {
-      passwordEncoder.map(pe -> pe.encode(clientDetails.getClientSecret()))
-                     .ifPresent(clientDetails::setClientSecret);
+      clientDetails.setClientSecret(passwordEncoder.encode(clientDetails.getClientSecret()));
     }
     return repository.save(clientDetails);
   }

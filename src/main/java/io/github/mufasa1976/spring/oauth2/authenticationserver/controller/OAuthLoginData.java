@@ -11,7 +11,7 @@ import static lombok.AccessLevel.PRIVATE;
 @NoArgsConstructor
 @AllArgsConstructor(access = PRIVATE)
 @Builder
-public class LoginData {
+public class OAuthLoginData {
   private String response_type;
   private String client_id;
   private String scope;

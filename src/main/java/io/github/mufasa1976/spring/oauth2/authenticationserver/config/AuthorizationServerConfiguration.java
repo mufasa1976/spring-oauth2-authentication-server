@@ -15,13 +15,15 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.A
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
-import org.springframework.security.oauth2.provider.token.*;
+import org.springframework.security.oauth2.provider.token.AccessTokenConverter;
+import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConverter;
+import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.oauth2.provider.token.UserAuthenticationConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFactory;
 
 import javax.validation.constraints.NotNull;
-import java.util.Arrays;
 
 @Configuration
 @RequiredArgsConstructor
@@ -46,10 +48,7 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     RedisClientDetailsServiceBuilder clientDetailsServiceBuilder = new RedisClientDetailsServiceBuilder(clientDetailsManager, internalClientName);
     clients.setBuilder(clientDetailsServiceBuilder);
     clientDetailsServiceBuilder.withClient(INTERNAL_CLIENT_ID)
-                               .secret("internal")
-                               .authorizedGrantTypes("authorization_code", "refresh_token", "password")
-                               .redirectUris("http://localhost:8080/login/oauth2/code/internal")
-                               .scopes("openid")
+                               .authorizedGrantTypes("password", "refresh_token")
                                .autoApprove("true");
   }
 
@@ -63,10 +62,8 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
 
   @Override
   public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-    TokenEnhancerChain tokenEnhancerChain = new TokenEnhancerChain();
-    tokenEnhancerChain.setTokenEnhancers(Arrays.asList(jwtAccessTokenConverter(), idTokenEnhancer()));
     endpoints.tokenStore(tokenStore())
-             .tokenEnhancer(tokenEnhancerChain)
+             .accessTokenConverter(jwtAccessTokenConverter())
              .authenticationManager(authenticationManager)
              .userDetailsService(userDetailsService);
   }
@@ -95,14 +92,5 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     MyUserAuthenticationConverter userAuthenticationConverter = new MyUserAuthenticationConverter();
     userAuthenticationConverter.setUserDetailsService(userDetailsService);
     return userAuthenticationConverter;
-  }
-
-  @Bean
-  public IdTokenEnhancer idTokenEnhancer() {
-    IdTokenEnhancer idTokenEnhancer = new IdTokenEnhancer();
-    idTokenEnhancer.setUserAuthenticationConverter(userAuthenticationConverter());
-    KeyStoreKeyFactory keystore = new KeyStoreKeyFactory(this.keystore, "changeIt".toCharArray());
-    idTokenEnhancer.setKeyPair(keystore.getKeyPair("jwt"));
-    return idTokenEnhancer;
   }
 }
