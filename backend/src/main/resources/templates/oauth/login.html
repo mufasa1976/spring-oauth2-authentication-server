@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Login</title>
+    <title th:text="${#messages.msg('loginForm.header', clientName)}">Login</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <link rel="stylesheet" type="text/css" media="all" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
-          th:href="@{/webjars/bootstrap/4.1.3/css/bootstrap.min.css}">
+    <link rel="stylesheet" type="text/css" media="all" href="../../static/oauth/css/styles.css" th:href="@{/oauth/css/styles.css}"/>
+    <link rel="stylesheet" type="text/css" media="all" href="https://cdn.jsdelivr.net/npm/materialize-css@1.0.0/dist/css/materialize.min.css"
+          th:href="@{/webjars/materializecss/1.0.0/css/materialize.css}">
     <link rel="stylesheet" type="text/css" media="all" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.2.0/css/all.min.css"
           th:href="@{/webjars/font-awesome/5.2.0/css/all.min.css}">
-    <link rel="stylesheet" type="text/css" media="all" href="../../static/oauth/css/styles.css" th:href="@{/css/styles.css}"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 </head>
 <body>
 <div class="container">
-    <div class="row">
-        <div class="col-12 login-card">
+    <div class="row valign-wrapper">
+        <div class="col s4 offset-s4">
             <form action="#" th:action="@{/oauth/login}" th:object="${loginData}" method="post">
                 <input type="hidden" th:field="*{response_type}">
                 <input type="hidden" th:field="*{client_id}">
@@ -20,22 +21,19 @@
                 <input type="hidden" th:field="*{redirect_uri}">
                 <input type="hidden" th:field="*{state}">
                 <div class="card">
-                    <div class="card-header" th:text="${#messages.msg('loginForm.header', clientName)}">
-                        Login
-                    </div>
-                    <div class="card-body">
-                        <div class="alert alert-danger" role="alert" th:if="${param.error}" th:text="#{loginForm.error}">Bad Credentials</div>
-                        <div class="form-group">
+                    <div class="card-content">
+                        <span class="card-title" th:text="${#messages.msg('loginForm.header', clientName)}">Login</span>
+                        <div class="input-field">
+                            <input type="text" id="username" name="username" class="validate" th:field="*{username}" autofocus required>
                             <label for="username" th:text="#{loginForm.field.username.label}">Username:</label>
-                            <input type="text" class="form-control" name="username" th:field="*{username}" autofocus>
                         </div>
-                        <div class="form-group">
+                        <div class="input-field">
+                            <input type="password" id="password" name="password" class="validate" th:field="*{password}" required>
                             <label for="password" th:text="#{loginForm.field.password.label}">Password:</label>
-                            <input type="password" class="form-control" name="password" th:field="*{password}">
                         </div>
                     </div>
-                    <div class="card-footer text-right">
-                        <button type="submit" class="btn btn-primary btn-block" th:text="#{loginForm.button.submit.label}"><i class="fas fa-sign-in-alt"></i> Login</button>
+                    <div class="card-action">
+                        <button type="submit" class="waves-effect waves-light btn"><i class="fas fa-sign-in-alt"></i> <span th:text="#{loginForm.button.submit.label}">Login</span></button>
                     </div>
                 </div>
             </form>
@@ -43,7 +41,22 @@
     </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" th:src="@{/webjars/jquery/3.3.1/jquery.min.js}"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.4/dist/popper.min.js" th:src="@{/webjars/popper.js/1.14.3/popper.js}"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js" th:src="@{/webjars/bootstrap/4.1.3/js/bootstrap.min.js}"></script>
+<script src="https://cdn.jsdelivr.net/npm/materialize-css@1.0.0/dist/js/materialize.min.js" th:src="@{/webjars/materializecss/1.0.0/js/materialize.js}"></script>
+<script type="text/javascript" th:inline="javascript">
+    function isError() {
+        if (!window.location.search) {
+            return false;
+        }
+        var search = window.location.search.substring(1);
+        return search.split('&').some(function (queryParamValue) {
+            return queryParamValue === 'error';
+        });
+    }
+
+    if (isError()) {
+        var badCredentials = /*[[#{loginForm.error}]]*/ "Bad Credentials";
+        M.toast({html: badCredentials});
+    }
+</script>
 </body>
 </html>
