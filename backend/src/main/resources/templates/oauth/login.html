@@ -20,7 +20,7 @@
                 <input type="hidden" th:field="*{scope}">
                 <input type="hidden" th:field="*{redirect_uri}">
                 <input type="hidden" th:field="*{state}">
-                <div class="card">
+                <div class="card z-depth-3">
                     <div class="card-content">
                         <span class="card-title" th:text="${#messages.msg('loginForm.header', clientName)}">Login</span>
                         <div class="input-field">
@@ -28,7 +28,7 @@
                             <label for="username" th:text="#{loginForm.field.username.label}">Username:</label>
                         </div>
                         <div class="input-field">
-                            <input type="password" id="password" name="password" class="validate" th:field="*{password}" required>
+                            <input type="password" id="password" name="password" class="validate" th:field="*{password}">
                             <label for="password" th:text="#{loginForm.field.password.label}">Password:</label>
                         </div>
                     </div>

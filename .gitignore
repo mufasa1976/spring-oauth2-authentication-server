@@ -25,3 +25,4 @@ target/
 /.nb-gradle/
 
 config.codekit3
+/frontend/node_modules/

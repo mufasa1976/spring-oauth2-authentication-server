@@ -12,6 +12,7 @@
     <description>Authentication Server based on Spring Boot</description>
 
     <modules>
+        <module>frontend</module>
         <module>backend</module>
     </modules>
 
@@ -24,6 +25,8 @@
 
         <spring-boot.version>2.0.5.RELEASE</spring-boot.version>
         <spring-cloud.version>Finchley.SR1</spring-cloud.version>
+
+        <frontend-maven-plugin.version>1.6</frontend-maven-plugin.version>
 
         <embedded-redis.version>0.6</embedded-redis.version>
 
@@ -78,6 +81,10 @@
         <pluginManagement>
             <plugins>
                 <plugin>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>3.1.0</version>
+                </plugin>
+                <plugin>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
                     <version>${spring-boot.version}</version>
@@ -91,6 +98,12 @@
                             </configuration>
                         </execution>
                     </executions>
+                </plugin>
+
+                <plugin>
+                    <groupId>com.github.eirslett</groupId>
+                    <artifactId>frontend-maven-plugin</artifactId>
+                    <version>${frontend-maven-plugin.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
