@@ -2,6 +2,7 @@ package io.github.mufasa1976.spring.oauth2.authenticationserver.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +20,7 @@ import javax.annotation.PreDestroy;
 
 @Configuration
 @EnableRedisRepositories
+@Slf4j
 public class RedisConfiguration {
   @Bean
   public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory, ObjectMapper objectMapper) {
@@ -52,11 +54,13 @@ public class RedisConfiguration {
     public void startRedis() throws Exception {
       redisServer = new RedisServer(properties.getPort());
       redisServer.start();
+      log.info("Internal Redis Server started");
     }
 
     @PreDestroy
     public void stopRedis() throws Exception {
       redisServer.stop();
+      log.info("Internal Redis Server stopped");
     }
   }
 
