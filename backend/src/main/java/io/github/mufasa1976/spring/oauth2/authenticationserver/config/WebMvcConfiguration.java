@@ -1,10 +1,14 @@
 package io.github.mufasa1976.spring.oauth2.authenticationserver.config;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.web.server.ErrorPage;
+import org.springframework.boot.web.server.WebServerFactoryCustomizer;
+import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.filter.ForwardedHeaderFilter;
+import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -19,7 +23,12 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 
   @Override
   public void addViewControllers(ViewControllerRegistry registry) {
-    registry.addViewController("/**").setViewName("index");
+    registry.addViewController("/").setViewName("index");
+  }
+
+  @Bean
+  public WebServerFactoryCustomizer<ConfigurableServletWebServerFactory> containerCustomiser() {
+    return container -> container.addErrorPages(new ErrorPage(NoHandlerFoundException.class, "/"));
   }
 
   @Override
