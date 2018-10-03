@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
 import org.springframework.ldap.core.ContextSource;
 import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
@@ -12,6 +13,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.Authentication;
@@ -45,7 +47,7 @@ import static org.springframework.security.oauth2.common.util.OAuth2Utils.*;
 
 @Configuration
 @RequiredArgsConstructor
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity
 @Slf4j
 public class SecurityConfiguration {
   private static final String ROLE_PREFIX = "";
@@ -69,9 +71,12 @@ public class SecurityConfiguration {
   public class AuthorizationServerSecurityConfiguration extends WebSecurityConfigurerAdapter {
     private final ContextSource contextSource;
 
-    public AuthorizationServerSecurityConfiguration(ContextSource contextSource, PasswordEncoder passwordEncoder) {
+    private final boolean debug;
+
+    public AuthorizationServerSecurityConfiguration(ContextSource contextSource, Environment environment) {
       super(true);
       this.contextSource = contextSource;
+      this.debug = environment.getProperty("debug") != null && !"false".equals(environment.getProperty("debug"));
     }
 
     @Bean
@@ -108,6 +113,11 @@ public class SecurityConfiguration {
       LdapUserDetailsService userDetailsService = new LdapUserDetailsService(ldapUserSearch, ldapAuthoritiesPopulator());
       userDetailsService.setUserDetailsMapper(userDetailsContextMapper());
       return userDetailsService;
+    }
+
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+      web.debug(debug);
     }
 
     @Override
