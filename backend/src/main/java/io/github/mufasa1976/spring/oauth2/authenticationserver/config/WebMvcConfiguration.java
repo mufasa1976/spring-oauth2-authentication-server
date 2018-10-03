@@ -6,9 +6,9 @@ import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.filter.ForwardedHeaderFilter;
-import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -28,7 +28,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 
   @Bean
   public WebServerFactoryCustomizer<ConfigurableServletWebServerFactory> containerCustomiser() {
-    return container -> container.addErrorPages(new ErrorPage(NoHandlerFoundException.class, "/"));
+    return container -> container.addErrorPages(new ErrorPage(HttpStatus.NOT_FOUND, "/"));
   }
 
   @Override
