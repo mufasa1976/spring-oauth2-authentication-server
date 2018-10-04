@@ -15,6 +15,8 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.A
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.*;
+import org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestFactory;
 import org.springframework.security.oauth2.provider.token.AccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.TokenStore;
@@ -24,6 +26,7 @@ import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFactory;
 
 import javax.validation.constraints.NotNull;
+import java.util.Map;
 
 @Configuration
 @RequiredArgsConstructor
@@ -65,7 +68,8 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     endpoints.tokenStore(tokenStore())
              .accessTokenConverter(jwtAccessTokenConverter())
              .authenticationManager(authenticationManager)
-             .userDetailsService(userDetailsService);
+             .userDetailsService(userDetailsService)
+             .requestFactory(oauth2RequestFactory(endpoints.getClientDetailsService()));
   }
 
   @Bean
@@ -92,5 +96,31 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     MyUserAuthenticationConverter userAuthenticationConverter = new MyUserAuthenticationConverter();
     userAuthenticationConverter.setUserDetailsService(userDetailsService);
     return userAuthenticationConverter;
+  }
+
+  @Bean
+  public OAuth2RequestFactory oauth2RequestFactory(ClientDetailsService clientDetailsService) {
+    DefaultOAuth2RequestFactory requestFactory = new DefaultOAuth2RequestFactory(clientDetailsService) {
+      private SecurityContextAccessor securityContextAccessor = new DefaultSecurityContextAccessor();
+
+      @Override
+      public void setSecurityContextAccessor(SecurityContextAccessor securityContextAccessor) {
+        super.setSecurityContextAccessor(securityContextAccessor);
+        this.securityContextAccessor = securityContextAccessor;
+      }
+
+      @Override
+      public AuthorizationRequest createAuthorizationRequest(Map<String, String> authorizationParameters) {
+        AuthorizationRequest authorizationRequest = super.createAuthorizationRequest(authorizationParameters);
+
+        if (securityContextAccessor.isUser()) {
+          authorizationRequest.setAuthorities(securityContextAccessor.getAuthorities());
+        }
+
+        return authorizationRequest;
+      }
+    };
+    requestFactory.setCheckUserScopes(true);
+    return requestFactory;
   }
 }

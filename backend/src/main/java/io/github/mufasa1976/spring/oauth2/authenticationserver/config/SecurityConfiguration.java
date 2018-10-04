@@ -30,11 +30,14 @@ import org.springframework.security.ldap.userdetails.LdapUserDetailsService;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.OAuth2RequestFactory;
+import org.springframework.security.oauth2.provider.endpoint.TokenEndpointAuthenticationFilter;
 import org.springframework.security.oauth2.provider.expression.OAuth2MethodSecurityExpressionHandler;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.servlet.Filter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -83,6 +86,11 @@ public class SecurityConfiguration {
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
       return super.authenticationManagerBean();
+    }
+
+    @Bean
+    public Filter tokenEndpointAuthenticationFilter(OAuth2RequestFactory oauth2RequestFactory) throws Exception {
+      return new TokenEndpointAuthenticationFilter(authenticationManagerBean(), oauth2RequestFactory);
     }
 
     @Override

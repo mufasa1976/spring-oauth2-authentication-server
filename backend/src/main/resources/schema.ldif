@@ -51,3 +51,9 @@ objectclass: top
 objectclass: groupOfNames
 cn: admin
 member: uid=admin,ou=people,dc=springframework,dc=org
+
+dn: cn=reader,ou=groups,dc=springframework,dc=org
+objectclass: top
+objectclass: groupOfNames
+cn: reader
+member: uid=user,ou=people,dc=springframework,dc=org
