@@ -1,4 +1,4 @@
-package io.github.mufasa1976.spring.oauth2.authenticationserver.model;
+package io.github.mufasa1976.spring.oauth2.authenticationserver.redis.model;
 
 import lombok.Data;
 import lombok.Getter;
@@ -35,6 +35,10 @@ public class RedisClientDetails implements ClientDetails {
   private Integer accessTokenValiditySeconds;
   private Integer refreshTokenValiditySeconds;
 
+  // non-standard Fields
+  @Setter
+  private String clientName;
+
   public static RedisClientDetails copyFrom(BaseClientDetails clientDetails) {
     RedisClientDetails clone = new RedisClientDetails();
     clone.setClientId(clientDetails.getClientId());
@@ -50,10 +54,6 @@ public class RedisClientDetails implements ClientDetails {
     clone.setRefreshTokenValiditySeconds(clientDetails.getRefreshTokenValiditySeconds());
     return clone;
   }
-
-  // non-standard Fields
-  @Setter
-  private String clientName;
 
   @Override
   public boolean isSecretRequired() {

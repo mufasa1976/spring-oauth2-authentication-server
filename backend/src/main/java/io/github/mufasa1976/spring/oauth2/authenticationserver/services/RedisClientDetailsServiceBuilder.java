@@ -1,7 +1,7 @@
 package io.github.mufasa1976.spring.oauth2.authenticationserver.services;
 
 import io.github.mufasa1976.spring.oauth2.authenticationserver.config.AuthorizationServerConfiguration;
-import io.github.mufasa1976.spring.oauth2.authenticationserver.model.RedisClientDetails;
+import io.github.mufasa1976.spring.oauth2.authenticationserver.redis.model.RedisClientDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.config.annotation.builders.ClientDetailsServiceBuilder;

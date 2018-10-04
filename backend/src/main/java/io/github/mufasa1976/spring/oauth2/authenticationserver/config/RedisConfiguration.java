@@ -1,10 +1,13 @@
 package io.github.mufasa1976.spring.oauth2.authenticationserver.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.mufasa1976.spring.oauth2.authenticationserver.redis.model.RedisClientDetails;
+import io.github.mufasa1976.spring.oauth2.authenticationserver.redis.repositories.RedisClientDetailsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -19,7 +22,8 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 @Configuration
-@EnableRedisRepositories
+@EnableRedisRepositories(basePackageClasses = RedisClientDetailsRepository.class)
+@EntityScan(basePackageClasses = RedisClientDetails.class)
 @Slf4j
 public class RedisConfiguration {
   @Bean

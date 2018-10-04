@@ -1,6 +1,6 @@
 package io.github.mufasa1976.spring.oauth2.authenticationserver.controller;
 
-import io.github.mufasa1976.spring.oauth2.authenticationserver.model.RedisClientDetails;
+import io.github.mufasa1976.spring.oauth2.authenticationserver.redis.model.RedisClientDetails;
 import io.github.mufasa1976.spring.oauth2.authenticationserver.services.RedisClientDetailsManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
