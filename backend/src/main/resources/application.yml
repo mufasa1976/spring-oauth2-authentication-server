@@ -14,3 +14,8 @@ spring:
   redis:
     embedded:
       enabled: true
+oauth2-server:
+  keystore: classpath:/jwt.jks
+  client-name: "OAuth2 Server"
+  allowed-ldap-groups-for-server-administration:
+  - admin

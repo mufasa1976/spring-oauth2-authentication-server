@@ -1,12 +1,11 @@
 package io.github.mufasa1976.spring.oauth2.authenticationserver.config;
 
+import io.github.mufasa1976.spring.oauth2.authenticationserver.ApplicationProperties;
 import io.github.mufasa1976.spring.oauth2.authenticationserver.services.RedisClientDetailsManager;
 import io.github.mufasa1976.spring.oauth2.authenticationserver.services.RedisClientDetailsServiceBuilder;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.Resource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,7 +24,6 @@ import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenCo
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFactory;
 
-import javax.validation.constraints.NotNull;
 import java.util.Map;
 
 @Configuration
@@ -33,25 +31,21 @@ import java.util.Map;
 @EnableAuthorizationServer
 public class AuthorizationServerConfiguration extends AuthorizationServerConfigurerAdapter {
   public static final String INTERNAL_CLIENT_ID = "internal";
+  public static final String INTERNAL_SCOPE = "internal_administration";
 
   private final PasswordEncoder passwordEncoder;
   private final AuthenticationManager authenticationManager;
   private final UserDetailsService userDetailsService;
   private final RedisClientDetailsManager clientDetailsManager;
-
-  @NotNull
-  @Value("${spring.security.oauth2.keystore}")
-  private Resource keystore;
-
-  @Value("${spring.security.oauth2.client-name:Internal Application}")
-  private String internalClientName;
+  private final ApplicationProperties properties;
 
   @Override
   public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-    RedisClientDetailsServiceBuilder clientDetailsServiceBuilder = new RedisClientDetailsServiceBuilder(clientDetailsManager, internalClientName);
+    RedisClientDetailsServiceBuilder clientDetailsServiceBuilder = new RedisClientDetailsServiceBuilder(clientDetailsManager, properties.getClientName());
     clients.setBuilder(clientDetailsServiceBuilder);
     clientDetailsServiceBuilder.withClient(INTERNAL_CLIENT_ID)
                                .authorizedGrantTypes("password", "refresh_token")
+                               .scopes(INTERNAL_SCOPE)
                                .autoApprove("true");
   }
 
@@ -81,7 +75,7 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
   public JwtAccessTokenConverter jwtAccessTokenConverter() {
     JwtAccessTokenConverter jwtAccessTokenConverter = new JwtAccessTokenConverter();
     jwtAccessTokenConverter.setAccessTokenConverter(accessTokenConverter());
-    KeyStoreKeyFactory keystore = new KeyStoreKeyFactory(this.keystore, "changeIt".toCharArray());
+    KeyStoreKeyFactory keystore = new KeyStoreKeyFactory(properties.getKeystore(), "changeIt".toCharArray());
     jwtAccessTokenConverter.setKeyPair(keystore.getKeyPair("jwt"));
     return jwtAccessTokenConverter;
   }

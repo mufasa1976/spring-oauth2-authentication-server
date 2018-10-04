@@ -53,8 +53,6 @@ import static org.springframework.security.oauth2.common.util.OAuth2Utils.*;
 @EnableWebSecurity
 @Slf4j
 public class SecurityConfiguration {
-  private static final String ROLE_PREFIX = "";
-
   @Bean
   public PasswordEncoder passwordEncoder() {
     return PasswordEncoderFactories.createDelegatingPasswordEncoder();
@@ -73,12 +71,14 @@ public class SecurityConfiguration {
   @Order(1)
   public class AuthorizationServerSecurityConfiguration extends WebSecurityConfigurerAdapter {
     private final ContextSource contextSource;
+    private final ScopedInetOrgPersonContextMapper scopedInetOrgPersonContextMapper;
 
     private final boolean debug;
 
-    public AuthorizationServerSecurityConfiguration(ContextSource contextSource, Environment environment) {
+    public AuthorizationServerSecurityConfiguration(ContextSource contextSource, ScopedInetOrgPersonContextMapper scopedInetOrgPersonContextMapper, Environment environment) {
       super(true);
       this.contextSource = contextSource;
+      this.scopedInetOrgPersonContextMapper = scopedInetOrgPersonContextMapper;
       this.debug = environment.getProperty("debug") != null && !"false".equals(environment.getProperty("debug"));
     }
 
@@ -99,19 +99,15 @@ public class SecurityConfiguration {
           .ldapAuthoritiesPopulator(ldapAuthoritiesPopulator())
           .userDnPatterns("uid={0},ou=people,dc=springframework,dc=org")
           .userDetailsContextMapper(new InetOrgPersonContextMapper())
-          .authoritiesMapper(userDetailsContextMapper())
+          .authoritiesMapper(scopedInetOrgPersonContextMapper)
           .contextSource((LdapContextSource) contextSource);
-    }
-
-    @Bean
-    public MyUserDetailsContextMapper userDetailsContextMapper() {
-      return new MyUserDetailsContextMapper();
     }
 
     @Bean
     public LdapAuthoritiesPopulator ldapAuthoritiesPopulator() {
       DefaultLdapAuthoritiesPopulator ldapAuthoritiesPopulator = new DefaultLdapAuthoritiesPopulator(contextSource, "ou=groups,dc=springframework,dc=org");
-      ldapAuthoritiesPopulator.setRolePrefix(ROLE_PREFIX);
+      ldapAuthoritiesPopulator.setConvertToUpperCase(false);
+      ldapAuthoritiesPopulator.setRolePrefix("");
       return ldapAuthoritiesPopulator;
     }
 
@@ -119,7 +115,7 @@ public class SecurityConfiguration {
     public UserDetailsService userDetailsService() {
       LdapUserSearch ldapUserSearch = new FilterBasedLdapUserSearch("ou=people,dc=springframework,dc=org", "uid={0}", (LdapContextSource) contextSource);
       LdapUserDetailsService userDetailsService = new LdapUserDetailsService(ldapUserSearch, ldapAuthoritiesPopulator());
-      userDetailsService.setUserDetailsMapper(userDetailsContextMapper());
+      userDetailsService.setUserDetailsMapper(scopedInetOrgPersonContextMapper);
       return userDetailsService;
     }
 

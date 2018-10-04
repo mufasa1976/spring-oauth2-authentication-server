@@ -2,11 +2,13 @@ package io.github.mufasa1976.spring.oauth2.authenticationserver;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 @SpringBootApplication
-public class AuthenticationServerApplication {
+@EnableConfigurationProperties(ApplicationProperties.class)
+public class Application {
 
   public static void main(String[] args) {
-    SpringApplication.run(AuthenticationServerApplication.class, args);
+    SpringApplication.run(Application.class, args);
   }
 }
