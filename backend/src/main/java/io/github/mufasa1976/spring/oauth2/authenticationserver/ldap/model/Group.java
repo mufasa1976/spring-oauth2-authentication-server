@@ -9,10 +9,11 @@ import javax.naming.Name;
 
 @Data
 @Entry(base = "ou=groups", objectClasses = "groupOfNames")
-public class Group {
+public final class Group {
   @Id
   private Name id;
 
   @Attribute(name = "cn")
   private String name;
+  private String description;
 }

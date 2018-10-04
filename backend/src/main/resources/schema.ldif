@@ -43,6 +43,7 @@ dn: cn=user,ou=groups,dc=springframework,dc=org
 objectclass: top
 objectclass: groupOfNames
 cn: user
+description: Users
 member: uid=admin,ou=people,dc=springframework,dc=org
 member: uid=user,ou=people,dc=springframework,dc=org
 
@@ -50,10 +51,12 @@ dn: cn=admin,ou=groups,dc=springframework,dc=org
 objectclass: top
 objectclass: groupOfNames
 cn: admin
+description: Administrators
 member: uid=admin,ou=people,dc=springframework,dc=org
 
 dn: cn=reader,ou=groups,dc=springframework,dc=org
 objectclass: top
 objectclass: groupOfNames
 cn: reader
+description: Readers
 member: uid=user,ou=people,dc=springframework,dc=org
