@@ -15,19 +15,6 @@ import static org.springframework.http.HttpStatus.CREATED;
 public class ScopeController {
   private final ScopeService scopeService;
 
-  @GetMapping("/api/groups")
-  public List<ScopeService.Group> getGroups() {
-    return scopeService.getGroups();
-  }
-
-  @PutMapping("/api/groups/{group}/scopes")
-  public ResponseEntity saveScopeMapping(@PathVariable("group") String group, @RequestBody @NotEmpty List<String> scopes) {
-    if (scopeService.saveScopeMapping(group, scopes)) {
-      return ResponseEntity.status(CREATED).build();
-    }
-    return ResponseEntity.ok().build();
-  }
-
   @GetMapping("/api/scopes")
   public List<ScopeService.Scope> getScopes() {
     return scopeService.getScopes();

@@ -6,6 +6,7 @@ spring:
       keystore: classpath:/jwt.jks
       client-name: Internal Application
   ldap:
+    base: dc=springframework,dc=org
     embedded:
       base-dn: dc=springframework,dc=org
       credential:

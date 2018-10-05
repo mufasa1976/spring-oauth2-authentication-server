@@ -3,7 +3,6 @@ package io.github.mufasa1976.spring.oauth2.authenticationserver.services;
 import io.github.mufasa1976.spring.oauth2.authenticationserver.config.AuthorizationServerConfiguration;
 import io.github.mufasa1976.spring.oauth2.authenticationserver.exception.InternalAdministrationScopeNotAllowedException;
 import io.github.mufasa1976.spring.oauth2.authenticationserver.exception.ScopeNotRegisteredException;
-import io.github.mufasa1976.spring.oauth2.authenticationserver.ldap.repository.GroupRepository;
 import io.github.mufasa1976.spring.oauth2.authenticationserver.redis.model.ScopeMapping;
 import io.github.mufasa1976.spring.oauth2.authenticationserver.redis.repositories.ScopeMappingRepository;
 import io.github.mufasa1976.spring.oauth2.authenticationserver.redis.repositories.ScopeRepository;
@@ -26,32 +25,14 @@ import java.util.stream.StreamSupport;
 @Service
 @RequiredArgsConstructor
 public class ScopeServiceImpl implements ScopeService {
-  private final GroupRepository groupRepository;
   private final ScopeMappingRepository scopeMappingRepository;
   private final ScopeRepository scopeRepository;
-
-  @Value
-  @Builder
-  private final static class GroupImpl implements ScopeService.Group {
-    private String name;
-    private String description;
-  }
 
   @Value
   @Builder
   private final static class ScopeImpl implements Scope {
     private String name;
     private String description;
-  }
-
-  @Override
-  public List<ScopeService.Group> getGroups() {
-    return StreamSupport.stream(groupRepository.findAll().spliterator(), false)
-                        .map(group -> GroupImpl.builder()
-                                               .name(group.getName())
-                                               .description(group.getDescription())
-                                               .build())
-                        .collect(Collectors.toList());
   }
 
   @Override

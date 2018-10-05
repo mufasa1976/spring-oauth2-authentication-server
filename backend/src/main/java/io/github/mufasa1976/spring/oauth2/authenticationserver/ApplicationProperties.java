@@ -18,4 +18,7 @@ public class ApplicationProperties {
   private String clientName = "OAuth2 Server";
 
   private List<String> allowedLdapGroupsForServerAdministration = new ArrayList<>();
+
+  @NotNull
+  private String ldapGroupFilter = "(objectClass=groupOfNames)";
 }

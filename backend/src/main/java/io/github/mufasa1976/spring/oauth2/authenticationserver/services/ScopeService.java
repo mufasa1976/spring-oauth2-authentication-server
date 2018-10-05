@@ -8,19 +8,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ScopeService {
-  interface Group {
-    String getName();
-
-    String getDescription();
-  }
-
   interface Scope {
     String getName();
 
     String getDescription();
   }
-
-  List<Group> getGroups();
 
   List<Scope> getScopes();
 

@@ -2,6 +2,7 @@ package io.github.mufasa1976.spring.oauth2.authenticationserver.config;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -73,6 +74,9 @@ public class SecurityConfiguration {
     private final ContextSource contextSource;
     private final ScopedInetOrgPersonContextMapper scopedInetOrgPersonContextMapper;
 
+    @Value("${spring.ldap.base}")
+    private String baseDN;
+
     private final boolean debug;
 
     public AuthorizationServerSecurityConfiguration(ContextSource contextSource, ScopedInetOrgPersonContextMapper scopedInetOrgPersonContextMapper, Environment environment) {
@@ -97,15 +101,22 @@ public class SecurityConfiguration {
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
       auth.ldapAuthentication()
           .ldapAuthoritiesPopulator(ldapAuthoritiesPopulator())
-          .userDnPatterns("uid={0},ou=people,dc=springframework,dc=org")
+          .userDnPatterns(appendBaseDN("uid={0},ou=people"))
           .userDetailsContextMapper(new InetOrgPersonContextMapper())
           .authoritiesMapper(scopedInetOrgPersonContextMapper)
           .contextSource((LdapContextSource) contextSource);
     }
 
+    private String appendBaseDN(String prefix) {
+      if (StringUtils.isEmpty(prefix)) {
+        return baseDN;
+      }
+      return prefix + ',' + baseDN;
+    }
+
     @Bean
     public LdapAuthoritiesPopulator ldapAuthoritiesPopulator() {
-      DefaultLdapAuthoritiesPopulator ldapAuthoritiesPopulator = new DefaultLdapAuthoritiesPopulator(contextSource, "ou=groups,dc=springframework,dc=org");
+      DefaultLdapAuthoritiesPopulator ldapAuthoritiesPopulator = new DefaultLdapAuthoritiesPopulator(contextSource, appendBaseDN("ou=groups"));
       ldapAuthoritiesPopulator.setConvertToUpperCase(false);
       ldapAuthoritiesPopulator.setRolePrefix("");
       return ldapAuthoritiesPopulator;
@@ -113,7 +124,7 @@ public class SecurityConfiguration {
 
     @Bean
     public UserDetailsService userDetailsService() {
-      LdapUserSearch ldapUserSearch = new FilterBasedLdapUserSearch("ou=people,dc=springframework,dc=org", "uid={0}", (LdapContextSource) contextSource);
+      LdapUserSearch ldapUserSearch = new FilterBasedLdapUserSearch(appendBaseDN("ou=people"), "uid={0}", (LdapContextSource) contextSource);
       LdapUserDetailsService userDetailsService = new LdapUserDetailsService(ldapUserSearch, ldapAuthoritiesPopulator());
       userDetailsService.setUserDetailsMapper(scopedInetOrgPersonContextMapper);
       return userDetailsService;
