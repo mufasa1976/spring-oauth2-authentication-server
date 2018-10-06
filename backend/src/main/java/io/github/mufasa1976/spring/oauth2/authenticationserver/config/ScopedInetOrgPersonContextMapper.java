@@ -12,10 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.ldap.userdetails.InetOrgPersonContextMapper;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor
@@ -37,6 +34,7 @@ public class ScopedInetOrgPersonContextMapper extends InetOrgPersonContextMapper
                .filter(Optional::isPresent)
                .map(Optional::get)
                .map(ScopeMapping::getScopes)
+               .filter(Objects::nonNull)
                .flatMap(Set::stream)
                .map(SimpleGrantedAuthority::new)
                .forEach(modifiedAuthorities::add);

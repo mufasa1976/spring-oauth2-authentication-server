@@ -1,11 +1,13 @@
 package io.github.mufasa1976.spring.oauth2.authenticationserver.controller;
 
+import io.github.mufasa1976.spring.oauth2.authenticationserver.exception.ScopeNotRegisteredException;
 import io.github.mufasa1976.spring.oauth2.authenticationserver.services.ScopeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.constraints.NotEmpty;
+import java.util.Comparator;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.CREATED;
@@ -17,7 +19,9 @@ public class ScopeController {
 
   @GetMapping("/api/scopes")
   public List<ScopeService.Scope> getScopes() {
-    return scopeService.getScopes();
+    List<ScopeService.Scope> scopes = scopeService.getScopes();
+    scopes.sort(Comparator.comparing(ScopeService.Scope::getName));
+    return scopes;
   }
 
   @GetMapping("/api/scopes/{scope}")
@@ -36,7 +40,12 @@ public class ScopeController {
   }
 
   @DeleteMapping("/api/scopes/{scope}")
-  public void deleteScope(@PathVariable("scope") String scope) {
-    scopeService.deleteScope(scope);
+  public ResponseEntity deleteScope(@PathVariable("scope") String scope, @RequestParam(value = "forced", defaultValue = "false") boolean forced) {
+    try {
+      scopeService.deleteScope(scope, forced);
+    } catch (ScopeNotRegisteredException e) {
+      return ResponseEntity.notFound().build();
+    }
+    return ResponseEntity.noContent().build();
   }
 }

@@ -2,7 +2,7 @@ package io.github.mufasa1976.spring.oauth2.authenticationserver.controller;
 
 import io.github.mufasa1976.spring.oauth2.authenticationserver.redis.model.RedisClientDetails;
 import io.github.mufasa1976.spring.oauth2.authenticationserver.services.RedisClientDetailsManager;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -15,11 +15,27 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import static lombok.AccessLevel.PRIVATE;
+
 @Controller
 @RequiredArgsConstructor
 public class OAuthLoginController {
   private static final String LOGIN_DATA = "loginData";
   private static final String CLIENT_NAME = "clientName";
+
+  @Data
+  @NoArgsConstructor
+  @AllArgsConstructor(access = PRIVATE)
+  @Builder
+  public static class OAuthLoginData {
+    private String response_type;
+    private String client_id;
+    private String scope;
+    private String redirect_uri;
+    private String username;
+    private String password;
+    private String state;
+  }
 
   private final RedisClientDetailsManager clientDetailsManager;
 

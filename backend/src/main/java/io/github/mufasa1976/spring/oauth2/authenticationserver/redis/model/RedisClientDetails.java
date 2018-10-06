@@ -27,7 +27,6 @@ public class RedisClientDetails implements ClientDetails {
   private Set<String> authorizedGrantTypes = new HashSet<>();
   @Getter(NONE)
   private Set<String> registeredRedirectUris;
-  @Getter(NONE)
   private Set<String> autoApprovedScopes;
   private Collection<GrantedAuthority> authorities = new ArrayList<>();
   @Getter(NONE)

@@ -1,10 +1,6 @@
 spring:
   jackson:
     default-property-inclusion: non_null
-  security:
-    oauth2:
-      keystore: classpath:/jwt.jks
-      client-name: Internal Application
   ldap:
     base: dc=springframework,dc=org
     embedded:

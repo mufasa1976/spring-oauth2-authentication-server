@@ -1,6 +1,7 @@
 package io.github.mufasa1976.spring.oauth2.authenticationserver.services;
 
 import io.github.mufasa1976.spring.oauth2.authenticationserver.ApplicationProperties;
+import io.github.mufasa1976.spring.oauth2.authenticationserver.exception.MissingScopeMappingException;
 import io.github.mufasa1976.spring.oauth2.authenticationserver.ldap.repository.GroupRepository;
 import io.github.mufasa1976.spring.oauth2.authenticationserver.redis.model.ScopeMapping;
 import io.github.mufasa1976.spring.oauth2.authenticationserver.redis.repositories.ScopeMappingRepository;
@@ -11,7 +12,10 @@ import org.springframework.ldap.query.LdapQuery;
 import org.springframework.ldap.query.LdapQueryBuilder;
 import org.springframework.stereotype.Service;
 
+import javax.validation.constraints.NotNull;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -48,6 +52,7 @@ public class GroupServiceImpl implements GroupService {
                            .base(baseDN)
                            .filter(applicationProperties.getLdapGroupFilter());
   }
+
 
   @Override
   public List<GroupService.Group> getUnmappedGroups() {
