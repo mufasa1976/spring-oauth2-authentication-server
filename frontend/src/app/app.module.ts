@@ -12,6 +12,7 @@ import {StoreDevtoolsModule} from '@ngrx/store-devtools';
 import {environment} from '../environments/environment';
 import {EffectsModule} from '@ngrx/effects';
 import {AuthenticationModule} from './authentication/authentication.module';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
 const HTTP_INTERCEPTOR_PROVIDERS: Provider[] = [
   {provide: HTTP_INTERCEPTORS, useClass: XRequestedWithInterceptor, multi: true}
@@ -27,6 +28,7 @@ const HTTP_INTERCEPTOR_PROVIDERS: Provider[] = [
 
     // @angular
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     HttpClientXsrfModule,
 
