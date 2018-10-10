@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-public class MyUserAuthenticationConverter extends DefaultUserAuthenticationConverter {
+public class LdapUserAuthenticationConverter extends DefaultUserAuthenticationConverter {
   @Override
   public Map<String, ?> convertUserAuthentication(Authentication authentication) {
     Map<String, Object> attributes = new HashMap<>(super.convertUserAuthentication(authentication));
