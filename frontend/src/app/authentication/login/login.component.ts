@@ -12,4 +12,7 @@ export class LoginComponent {
 
   constructor() { }
 
+  login() {
+
+  }
 }
