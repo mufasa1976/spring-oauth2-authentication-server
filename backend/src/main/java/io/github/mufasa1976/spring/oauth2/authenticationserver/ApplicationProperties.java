@@ -21,4 +21,6 @@ public class ApplicationProperties {
 
   @NotNull
   private String ldapGroupFilter = "(objectClass=groupOfNames)";
+
+  private boolean checkUserScope = false;
 }

@@ -3,6 +3,7 @@ package io.github.mufasa1976.spring.oauth2.authenticationserver.config;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -10,7 +11,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.ldap.core.ContextSource;
 import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
+import org.springframework.security.authentication.AuthenticationDetailsSource;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -28,12 +31,15 @@ import org.springframework.security.ldap.userdetails.DefaultLdapAuthoritiesPopul
 import org.springframework.security.ldap.userdetails.InetOrgPersonContextMapper;
 import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 import org.springframework.security.ldap.userdetails.LdapUserDetailsService;
+import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.OAuth2Request;
 import org.springframework.security.oauth2.provider.OAuth2RequestFactory;
 import org.springframework.security.oauth2.provider.endpoint.TokenEndpointAuthenticationFilter;
 import org.springframework.security.oauth2.provider.expression.OAuth2MethodSecurityExpressionHandler;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -93,8 +99,35 @@ public class SecurityConfiguration {
     }
 
     @Bean
+    @ConditionalOnProperty(prefix = "oauth2-server", name = "check-user-scope")
     public Filter tokenEndpointAuthenticationFilter(OAuth2RequestFactory oauth2RequestFactory) throws Exception {
-      return new TokenEndpointAuthenticationFilter(authenticationManagerBean(), oauth2RequestFactory);
+      TokenEndpointAuthenticationFilter tokenEndpointAuthenticationFilter = new TokenEndpointAuthenticationFilter(authenticationManagerBean(), oauth2RequestFactory) {
+        private AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource;
+
+        @Override
+        public void setAuthenticationDetailsSource(AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource) {
+          super.setAuthenticationDetailsSource(authenticationDetailsSource);
+          this.authenticationDetailsSource = authenticationDetailsSource;
+        }
+
+        @Override
+        protected Authentication extractCredentials(HttpServletRequest request) {
+          String grantType = request.getParameter("grant_type");
+          if (grantType != null && grantType.equals("password")) {
+            UsernamePasswordAuthenticationToken result = new UsernamePasswordAuthenticationToken(
+                request.getParameter("username"), request.getParameter("password"));
+            result.setDetails(authenticationDetailsSource.buildDetails(request));
+            return result;
+          }
+          if (grantType != null && grantType.equals("refresh_token")) {
+            String refreshToken = request.getParameter("refresh_token");
+            // TODO: handle the Refresh-Token
+          }
+          return null;
+        }
+      };
+      tokenEndpointAuthenticationFilter.setAuthenticationDetailsSource(new WebAuthenticationDetailsSource());
+      return tokenEndpointAuthenticationFilter;
     }
 
     @Override

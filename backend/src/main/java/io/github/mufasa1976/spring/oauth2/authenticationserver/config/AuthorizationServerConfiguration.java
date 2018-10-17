@@ -94,6 +94,10 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
 
   @Bean
   public OAuth2RequestFactory oauth2RequestFactory(ClientDetailsService clientDetailsService) {
+    if (!properties.isCheckUserScope()) {
+      return new DefaultOAuth2RequestFactory(clientDetailsService);
+    }
+
     DefaultOAuth2RequestFactory requestFactory = new DefaultOAuth2RequestFactory(clientDetailsService) {
       private SecurityContextAccessor securityContextAccessor = new DefaultSecurityContextAccessor();
 
