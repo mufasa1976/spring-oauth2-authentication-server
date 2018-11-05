@@ -7,8 +7,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.common.util.OAuth2Utils;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
@@ -24,7 +26,9 @@ import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenCo
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFactory;
 
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 @Configuration
 @RequiredArgsConstructor
@@ -46,6 +50,7 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     clientDetailsServiceBuilder.withClient(INTERNAL_CLIENT_ID)
                                .authorizedGrantTypes("password", "refresh_token")
                                .scopes(INTERNAL_SCOPE)
+                               .authorities(INTERNAL_SCOPE)
                                .autoApprove("true");
   }
 

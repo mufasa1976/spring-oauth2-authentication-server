@@ -23,8 +23,8 @@
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
 
-    <spring-boot.version>2.0.5.RELEASE</spring-boot.version>
-    <spring-security-oauth2.version>2.3.3.RELEASE</spring-security-oauth2.version>
+    <spring-boot.version>2.0.6.RELEASE</spring-boot.version>
+    <spring-security-oauth2.version>2.3.4.RELEASE</spring-security-oauth2.version>
     <spring-security-jwt.version>1.0.9.RELEASE</spring-security-jwt.version>
 
     <frontend-maven-plugin.version>1.6</frontend-maven-plugin.version>
